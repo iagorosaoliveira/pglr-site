@@ -22,17 +22,17 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/cena.css">
-  <link rel="stylesheet" href="css/arsenal.css">
-  <link rel="stylesheet" href="css/sobre.css">
+  <link rel="stylesheet" href="css/vitrine.css">
+  <link rel="stylesheet" href="css/rota.css">
   <link rel="stylesheet" href="css/intro.css">
-  <link rel="stylesheet" href="css/efeitos.css">
 
   <script defer src="js/catalogo.js"></script>
   <script defer src="js/contato.js"></script>
   <script defer src="js/intro.js"></script>
   <script defer src="js/cena.js"></script>
-  <script defer src="js/arsenal.js"></script>
+  <script defer src="js/vitrine.js"></script>
   <script defer src="js/efeitos.js"></script>
+  <script defer src="js/rota.js"></script>
   <script defer src="js/main.js"></script>
 </head>
 <body>
@@ -161,6 +161,7 @@
       </div>
     </section>
 
+    <div class="comporta">
     <div class="faixa" aria-hidden="true">
       <div class="faixa-trilho" id="faixa">
         <span>SE VIS PACEM</span><i>✕</i><span>PARA BELLUM</span><i>✕</i><span>FEITO EM SÃO PAULO</span><i>✕</i><span>PGLR TÁTICO</span><i>✕</i>
@@ -169,86 +170,132 @@
 
     <section id="arsenal" class="arsenal" aria-labelledby="arsenal-titulo">
       <div class="secao-topo">
-        <p class="rotulo" data-decodificar>VITRINE · PEDIDO PELO WHATSAPP</p>
-        <h2 id="arsenal-titulo" class="secao-titulo" data-letras>ARSENAL</h2>
-        <p class="rotulo" id="arsenal-contagem" data-decodificar></p>
+        <p class="rotulo">VITRINE · PEDIDO PELO WHATSAPP</p>
+        <h2 id="arsenal-titulo" class="secao-titulo">ARSENAL</h2>
+        <p class="rotulo" id="arsenal-contagem"></p>
       </div>
-      <div id="arsenal-grade" class="arsenal-grade"></div>
+
+      <div class="vitrine" id="vitrine">
+        <div class="vitrine-palco">
+          <div class="mira" id="vitrine-mira" role="region" aria-roledescription="carrossel" aria-label="Estampas" tabindex="0">
+            <span class="mira-anel" aria-hidden="true"></span>
+            <span class="mira-anel-fino" aria-hidden="true"></span>
+            <span class="mira-fio mira-fio-cima" aria-hidden="true"></span>
+            <span class="mira-fio mira-fio-baixo" aria-hidden="true"></span>
+            <span class="mira-alvo" id="vitrine-alvo" aria-hidden="true">ALVO 01 / 06</span>
+            <img class="vizinha vizinha-anterior" id="vitrine-anterior" alt="" decoding="async">
+            <img class="vizinha vizinha-proxima" id="vitrine-proxima" alt="" decoding="async">
+            <div class="camisa" id="vitrine-camisa"><img id="vitrine-foto" alt="" decoding="async"></div>
+            <i class="mira-laser" id="vitrine-laser" aria-hidden="true"></i>
+            <button type="button" class="mira-seta mira-seta-anterior" id="vitrine-voltar" aria-label="Estampa anterior">‹</button>
+            <button type="button" class="mira-seta mira-seta-proxima" id="vitrine-avancar" aria-label="Próxima estampa">›</button>
+          </div>
+          <div class="lados" role="group" aria-label="Lado da camisa">
+            <button type="button" data-lado="costas" aria-pressed="true">Costas</button>
+            <button type="button" data-lado="frente" aria-pressed="false">Frente</button>
+          </div>
+          <div class="trilho" id="vitrine-trilho" role="group" aria-label="Escolher estampa"></div>
+        </div>
+
+        <div class="vitrine-info">
+          <p class="rotulo vitrine-num" id="vitrine-num">Nº 01</p>
+          <h3 class="vitrine-nome" id="vitrine-nome">Se Vis Pacem</h3>
+          <p class="vitrine-desc" id="vitrine-desc"></p>
+          <div class="seletor seletor-cores" id="vitrine-cores" role="group" aria-label="Cor"></div>
+          <div class="seletor seletor-arte" id="vitrine-artes" role="group" aria-label="Arte" hidden></div>
+          <a class="pilula vitrine-pedir" id="vitrine-pedir" target="_blank" rel="noopener">Pedir no WhatsApp</a>
+        </div>
+
+        <p class="sr-only" id="vitrine-anuncio" aria-live="polite"></p>
+      </div>
     </section>
 
     <section id="sobre" class="sobre" aria-labelledby="sobre-titulo">
-      <div class="sobre-abertura">
-        <div class="sobre-texto">
-          <p class="rotulo" data-decodificar>QUEM SOMOS · PGLR TÁTICO</p>
-          <h2 id="sobre-titulo" class="sobre-titulo" data-palavras>Sua base de confiança no mundo tático.</h2>
-          <p class="sobre-lead">Bem-vindo à PGLR TÁTICO, a sua base de confiança no mundo tático! Aqui não somos apenas uma loja: somos uma equipe movida por disciplina, estratégia e paixão pelo universo tático.</p>
-          <p class="sobre-corpo">Nosso objetivo é simples: oferecer equipamentos de alta qualidade, que entreguem resistência, funcionalidade e estilo, seja para uso profissional, treinamentos, operações, aventuras ao ar livre ou até no seu dia a dia.</p>
+      <div class="rota">
+        <div class="rota-pontos">
+          <i class="rota-linha" aria-hidden="true"></i>
+          <i class="rota-progresso" aria-hidden="true"></i>
+
+          <article class="ponto ponto-abertura" data-ponto>
+            <span class="ponto-marca" aria-hidden="true"></span>
+            <p class="ponto-rotulo" data-rotulo>WP-00 · QUEM SOMOS · PGLR TÁTICO</p>
+            <div class="ponto-corpo">
+              <div class="abertura-texto">
+                <h2 id="sobre-titulo" class="sobre-titulo">Sua base de confiança no mundo tático.</h2>
+                <p class="sobre-lead">Bem-vindo à PGLR TÁTICO, a sua base de confiança no mundo tático! Aqui não somos apenas uma loja: somos uma equipe movida por disciplina, estratégia e paixão pelo universo tático.</p>
+                <p class="sobre-corpo">Nosso objetivo é simples: oferecer equipamentos de alta qualidade, que entreguem resistência, funcionalidade e estilo, seja para uso profissional, treinamentos, operações, aventuras ao ar livre ou até no seu dia a dia.</p>
+              </div>
+              <figure class="sobre-escudo">
+                <span class="escudo-anel" aria-hidden="true"></span>
+                <img src="assets/img/logo/pglr.svg" alt="" width="150" height="150">
+              </figure>
+            </div>
+          </article>
+
+          <article class="ponto" data-ponto>
+            <span class="ponto-marca" aria-hidden="true"></span>
+            <p class="ponto-rotulo" data-rotulo>WP-01 · MISSÃO</p>
+            <div class="ponto-corpo">
+              <h3 class="ponto-titulo">Nossa Missão</h3>
+              <p>Fornecer produtos que unam durabilidade, eficiência e credibilidade, acompanhando nossos clientes em cada desafio.</p>
+            </div>
+          </article>
+
+          <article class="ponto" data-ponto>
+            <span class="ponto-marca" aria-hidden="true"></span>
+            <p class="ponto-rotulo" data-rotulo>WP-02 · VISÃO</p>
+            <div class="ponto-corpo">
+              <h3 class="ponto-titulo">Nossa Visão</h3>
+              <p>Ser referência nacional no setor tático, construindo uma comunidade sólida e respeitada, onde cada cliente é também um parceiro de missão.</p>
+            </div>
+          </article>
+
+          <article class="ponto" data-ponto>
+            <span class="ponto-marca" aria-hidden="true"></span>
+            <p class="ponto-rotulo" data-rotulo>WP-03 · NOSSOS VALORES</p>
+            <div class="ponto-corpo">
+              <ul class="rota-valores">
+                <li><span class="valor-codigo">V-01</span><h3 class="valor-nome">Confiança</h3><p>Transparência em cada venda e suporte.</p></li>
+                <li><span class="valor-codigo">V-02</span><h3 class="valor-nome">Qualidade</h3><p>Seleção criteriosa de cada produto.</p></li>
+                <li><span class="valor-codigo">V-03</span><h3 class="valor-nome">Comprometimento</h3><p>Respeito a quem confia na nossa marca.</p></li>
+                <li><span class="valor-codigo">V-04</span><h3 class="valor-nome">Comunidade</h3><p>Não vendemos apenas, construímos laços.</p></li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="ponto" data-ponto>
+            <span class="ponto-marca" aria-hidden="true"></span>
+            <p class="ponto-rotulo" data-rotulo>WP-04 · COM A GENTE</p>
+            <div class="ponto-corpo">
+              <h3 class="ponto-titulo">Com a gente você vai encontrar:</h3>
+              <ul class="rota-lista">
+                <li>Novidades e lançamentos em primeira mão</li>
+                <li>Ofertas e promoções exclusivas para a comunidade</li>
+                <li>Atendimento rápido e sem enrolação</li>
+                <li>Espaço para troca de ideias e experiências</li>
+              </ul>
+            </div>
+          </article>
         </div>
-        <figure class="sobre-escudo revelar">
-          <svg class="sobre-mira" viewBox="-100 -100 200 200" aria-hidden="true">
-            <g class="sm-gira">
-              <circle r="96" class="sm-anel"/>
-              <path class="sm-marcas" d="M0 -96V-86M0 86V96M-96 0H-86M86 0H96"/>
-            </g>
-            <circle r="84" class="sm-fino"/>
-            <path class="sm-travas" d="M-70 -50V-70H-50M50 -70H70V-50M70 50V70H50M-50 70H-70V50"/>
-          </svg>
-          <img src="assets/img/logo/pglr.svg" alt="" width="150" height="150">
-        </figure>
-      </div>
 
-      <div class="sobre-blocos">
-        <article class="bloco revelar">
-          <span class="canto canto-1"></span><span class="canto canto-2"></span><span class="canto canto-3"></span><span class="canto canto-4"></span>
-          <p class="rotulo" data-decodificar>01 · MISSÃO</p><span class="bloco-num" aria-hidden="true">01</span>
-          <h3 class="bloco-titulo">Nossa Missão</h3>
-          <p>Fornecer produtos que unam durabilidade, eficiência e credibilidade, acompanhando nossos clientes em cada desafio.</p>
-        </article>
-        <article class="bloco revelar">
-          <span class="canto canto-1"></span><span class="canto canto-2"></span><span class="canto canto-3"></span><span class="canto canto-4"></span>
-          <p class="rotulo" data-decodificar>02 · VISÃO</p><span class="bloco-num" aria-hidden="true">02</span>
-          <h3 class="bloco-titulo">Nossa Visão</h3>
-          <p>Ser referência nacional no setor tático, construindo uma comunidade sólida e respeitada, onde cada cliente é também um parceiro de missão.</p>
-        </article>
-      </div>
-
-      <div class="sobre-valores">
-        <p class="rotulo" data-decodificar>03 · NOSSOS VALORES</p>
-        <ul class="valores">
-          <li class="revelar"><h3 class="valor-nome">Confiança</h3><p>Transparência em cada venda e suporte.</p></li>
-          <li class="revelar"><h3 class="valor-nome">Qualidade</h3><p>Seleção criteriosa de cada produto.</p></li>
-          <li class="revelar"><h3 class="valor-nome">Comprometimento</h3><p>Respeito a quem confia na nossa marca.</p></li>
-          <li class="revelar"><h3 class="valor-nome">Comunidade</h3><p>Não vendemos apenas, construímos laços.</p></li>
-        </ul>
-      </div>
-
-      <div class="sobre-lista">
-        <p class="rotulo" data-decodificar>04 · COM A GENTE</p>
-        <h3 class="bloco-titulo">Com a gente você vai encontrar:</h3>
-        <ul class="lista-mira revelar-grupo">
-          <li>Novidades e lançamentos em primeira mão</li>
-          <li>Ofertas e promoções exclusivas para a comunidade</li>
-          <li>Atendimento rápido e sem enrolação</li>
-          <li>Espaço para troca de ideias e experiências</li>
-        </ul>
-      </div>
-
-      <div class="sobre-fecho revelar">
-        <p class="sobre-fecho-titulo" data-palavras>PGLR TÁTICO é mais do que comércio, é uma missão compartilhada.</p>
-        <p class="sobre-fecho-sub">Se você valoriza estratégia, preparo e qualidade, então está no lugar certo.</p>
-        <a class="pilula" data-whatsapp>Chamar no WhatsApp</a>
+        <div class="rota-destino" id="rota-destino">
+          <p class="rotulo">DESTINO</p>
+          <p class="sobre-fecho-titulo">PGLR TÁTICO é mais do que comércio, é uma missão compartilhada.</p>
+          <p class="sobre-fecho-sub">Se você valoriza estratégia, preparo e qualidade, então está no lugar certo.</p>
+          <a class="pilula" data-whatsapp>Chamar no WhatsApp</a>
+        </div>
       </div>
     </section>
+    </div><!-- /comporta -->
   </main>
 
   <footer class="rodape">
-    <img src="assets/img/logo/pglr.svg" alt="PGLR Tático" width="44" height="44">
-    <p class="rodape-nome">PGLR Tático · São Paulo</p>
+    <p class="rodape-marca">PGLR TÁTICO</p>
     <nav class="rodape-links" aria-label="Contato">
       <a data-whatsapp>WhatsApp</a>
       <a data-instagram>@pglrtatico</a>
     </nav>
-    <p class="rodape-direitos">© 2026 PGLR Tático</p>
+    <p class="rodape-dados"><span>São Paulo · 23°33′S 46°38′W</span><span>© 2026 PGLR Tático</span></p>
   </footer>
 
   <a class="whats-flutuante" data-whatsapp aria-label="Falar no WhatsApp">

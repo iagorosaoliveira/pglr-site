@@ -4,7 +4,8 @@ Vitrine das camisas táticas da **PGLR Tático**, de São Paulo. O pedido é fei
 
 - **Intro "aquisição de alvo":** HUD tático, mira que trava no escudo e portas blindadas que abrem.
 - **Abertura controlada pela rolagem:** uma animação própria de partículas em canvas: terreno com radar, formação do escudo, varredura laser e dispersão.
-- **Arsenal:** as estampas com troca de cor, arte e frente/costas, e pedido pronto pelo WhatsApp.
+- **Arsenal:** carrossel com mira, uma estampa por vez com as vizinhas pela borda, trilho com todas as miniaturas, troca de cor, arte e frente/costas, e pedido pronto pelo WhatsApp. Troca por arrasto, setas, miniaturas ou teclado.
+- **Quem Somos:** rota de missão: uma linha vermelha desce com a rolagem e acende cada ponto de passagem até o destino.
 
 Site estático: HTML, CSS e JavaScript puros, sem build e sem dependências. Para ver localmente, sirva a pasta com qualquer servidor estático (por exemplo `npx serve .`) e abra no navegador.
 

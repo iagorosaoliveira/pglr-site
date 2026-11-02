@@ -7,9 +7,9 @@
 
   html.classList.toggle("reduzido", reduzido);
   PGLR.contato.ligarContatos(document, PGLR.catalogo);
-  PGLR.arsenal.init(document.getElementById("arsenal-grade"), PGLR.catalogo);
-  // efeitos do interior: depois do arsenal, que escreve a contagem decodificada
+  PGLR.vitrine.init(document.getElementById("vitrine"), PGLR.catalogo, { reduzido: reduzido });
   PGLR.efeitos.init(document, { reduzido: reduzido });
+  PGLR.rota.init(document, { reduzido: reduzido });
 
   // A intro cobre o carregamento: só sai quando a animação acabou (ou foi pulada)
   // E o vídeo está pronto (ou o tempo-limite da cena venceu).

@@ -360,6 +360,19 @@ body::after{
   color:var(--laser, #ff3b2f);
 }
 
+/* ---------- comporta: faixa + interior sobem por cima do fim da cena.
+   -40svh: com a trilha de 560vh, a borda entra pela base da tela em progresso ≈ 0,91,
+   depois de o painel 3 estar inteiro (0,85). */
+.comporta{
+  position:relative;
+  z-index:30;
+  margin-top:-40vh;
+  margin-top:-40svh;
+  background:var(--bg);
+  box-shadow:0 -40px 80px rgba(0,0,0,.65);
+}
+.reduzido .comporta{ margin-top:0; box-shadow:none; }
+
 @media (max-width:900px){
   .veu{
     background:

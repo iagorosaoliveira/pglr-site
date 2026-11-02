@@ -1,8 +1,7 @@
-/* Efeitos do interior (fora da cena de rolagem, onde IntersectionObserver é permitido):
-   - .revelar / .revelar-grupo aparecem ao entrar na tela;
-   - [data-letras] entra letra a letra e [data-palavras] palavra a palavra;
-   - [data-decodificar] embaralha e "decodifica" o texto, como no HUD da intro;
-   - a faixa do lema corre sozinha e acelera com a velocidade da rolagem. */
+/* Efeitos do interior:
+   - a faixa do lema (borda da comporta) corre sozinha e acelera com a rolagem;
+   - decodificar(win, el) embaralha o texto de um elemento e o "decodifica", como no HUD
+     da intro (usado pelos rótulos da rota). */
 (function (raiz, fabrica) {
   var api = fabrica();
   if (typeof module === "object" && module.exports) module.exports = api;
@@ -13,38 +12,6 @@
   var SINAIS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#/%<>";
   var VELOCIDADE_FAIXA = 0.6;   // px por quadro, parada
   var EMPURRAO_ROLAGEM = 0.35;  // quanto a velocidade da rolagem empurra a faixa
-
-  function dividirLetras(doc, el) {
-    var texto = el.textContent;
-    el.setAttribute("aria-label", texto);
-    el.textContent = "";
-    texto.split("").forEach(function (c, i) {
-      var s = doc.createElement("span");
-      s.className = "letra";
-      s.setAttribute("aria-hidden", "true");
-      s.style.setProperty("--i", i);
-      s.textContent = c;
-      el.appendChild(s);
-    });
-  }
-
-  function dividirPalavras(doc, el) {
-    var texto = el.textContent.replace(/\s+/g, " ").trim();
-    el.setAttribute("aria-label", texto);
-    el.textContent = "";
-    texto.split(" ").forEach(function (p, i) {
-      if (i) el.appendChild(doc.createTextNode(" "));
-      var fora = doc.createElement("span");
-      fora.className = "palavra";
-      fora.setAttribute("aria-hidden", "true");
-      var dentro = doc.createElement("span");
-      dentro.className = "palavra-in";
-      dentro.style.setProperty("--i", i);
-      dentro.textContent = p;
-      fora.appendChild(dentro);
-      el.appendChild(fora);
-    });
-  }
 
   function decodificar(win, el) {
     var texto = el.textContent;
@@ -78,7 +45,7 @@
       ultimoY = y;
       var metade = trilho.scrollWidth / 2;
       x -= VELOCIDADE_FAIXA + Math.abs(empurrao);
-      if (metade > 0) x = ((x % metade) - metade) % metade;
+      if (metade > 0) x = x % metade;
       trilho.style.transform = "translate3d(" + x.toFixed(1) + "px,0,0)";
       win.requestAnimationFrame(quadro);
     }
@@ -90,27 +57,8 @@
   }
 
   function init(doc, opcoes) {
-    var win = doc.defaultView;
-    var reduzido = !!(opcoes && opcoes.reduzido);
-
-    [].forEach.call(doc.querySelectorAll("[data-letras]"), function (el) { dividirLetras(doc, el); });
-    [].forEach.call(doc.querySelectorAll("[data-palavras]"), function (el) { dividirPalavras(doc, el); });
-    faixa(doc, win, reduzido);
-
-    if (reduzido || !("IntersectionObserver" in win)) return;
-    doc.documentElement.classList.add("com-revelar");
-
-    var alvos = doc.querySelectorAll(".revelar, .revelar-grupo, [data-letras], [data-palavras], [data-decodificar]");
-    var obs = new win.IntersectionObserver(function (entradas) {
-      entradas.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        e.target.classList.add("visivel");
-        if (e.target.hasAttribute("data-decodificar")) decodificar(win, e.target);
-        obs.unobserve(e.target);
-      });
-    }, { rootMargin: "0px 0px -12% 0px" });
-    [].forEach.call(alvos, function (n) { obs.observe(n); });
+    faixa(doc, doc.defaultView, !!(opcoes && opcoes.reduzido));
   }
 
-  return { init: init };
+  return { decodificar: decodificar, init: init };
 });

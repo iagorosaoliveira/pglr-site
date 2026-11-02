@@ -27,7 +27,7 @@
   var SUAVIZACAO = 0.115;      // fração do caminho que a animação anda até a rolagem, por quadro
   var LIMIAR = 0.0004;
   // Onde cada capítulo do trilho leva a rolagem (meio do trecho em que o painel está inteiro)
-  var PARADAS = [0, 0.5, 0.93];
+  var PARADAS = [0, 0.5, 0.88];
 
   // Fases da animação (início de cada uma, em progresso)
   var FORMA_INI = 0.25, FORMA_FIM = 0.60, DISPERSA_INI = 0.80;
@@ -491,7 +491,7 @@
       return new Promise(function (resolver) {
         var tarefas = [];
         if (doc.fonts && doc.fonts.ready) tarefas.push(doc.fonts.ready);
-        [].slice.call(doc.querySelectorAll("#arsenal-grade .face-costas"), 0, 3).forEach(function (img) {
+        [].slice.call(doc.querySelectorAll("#vitrine-foto, #vitrine-anterior, #vitrine-proxima")).forEach(function (img) {
           var src = img.getAttribute("src");
           if (!src) return;
           tarefas.push(new Promise(function (ok) {

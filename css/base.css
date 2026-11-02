@@ -8,6 +8,7 @@
   --rule:rgba(236,235,231,.14);
   --accent:#ffffff;
   --ease:cubic-bezier(.22,.61,.36,1);
+  --ease-out:cubic-bezier(.23,1,.32,1);
 
   --fonte-titulo:'Big Shoulders Stencil Display','Impact','Arial Narrow',sans-serif;
   --fonte-mono:'JetBrains Mono',ui-monospace,'Consolas',monospace;

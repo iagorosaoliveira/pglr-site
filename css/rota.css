@@ -1,0 +1,211 @@
+/* Quem Somos em rota de missão: linha lateral, pontos de passagem (WP) e destino.
+   Os estados escondidos só valem com .com-movimento (posta pelo rota.js); sem JS ou
+   com movimento reduzido, tudo aparece direto. */
+
+.sobre{
+  position:relative;
+  background:var(--bg);
+  padding:clamp(56px, 8vw, 110px) max(var(--margem), env(safe-area-inset-right, 0px)) clamp(64px, 9vw, 120px) max(var(--margem), env(safe-area-inset-left, 0px));
+  border-top:1px solid var(--rule);
+}
+.rota{
+  --trilho:10px;   /* distância da linha até a borda da rota */
+  --recuo:40px;    /* onde o conteúdo começa */
+  max-width:980px;
+  margin:0 auto;
+}
+.rota-pontos{ position:relative; padding-left:var(--recuo); }
+.rota-linha,
+.rota-progresso{ position:absolute; top:6px; bottom:0; pointer-events:none; }
+.rota-linha{ left:var(--trilho); width:1px; background:rgba(236,235,231,.16); }
+.rota-progresso{
+  left:calc(var(--trilho) - .5px);
+  width:2px;
+  background:var(--laser);
+  box-shadow:0 0 10px var(--laser-glow);
+  transform-origin:50% 0;
+  transform:scaleY(0);
+}
+
+/* ---------- pontos */
+.ponto{ position:relative; padding-bottom:clamp(56px, 8vw, 96px); }
+.ponto:last-of-type{ padding-bottom:0; }
+.ponto-marca{
+  position:absolute;
+  left:calc(var(--trilho) - var(--recuo) - 5px);
+  top:3px;
+  width:10px;
+  height:10px;
+  border:1.5px solid rgba(236,235,231,.5);
+  background:var(--bg);
+  transform:rotate(45deg);
+  transition:background-color .3s var(--ease), border-color .3s var(--ease);
+}
+.ponto-marca::after{
+  content:"";
+  position:absolute;
+  inset:-8px;
+  border-radius:50%;
+  border:1px solid var(--laser);
+  opacity:0;
+}
+.ponto.aceso .ponto-marca{ background:var(--laser); border-color:var(--laser); }
+.ponto.atual .ponto-marca::after{ animation:rota-pulso 2.4s var(--ease-out) infinite; }
+@keyframes rota-pulso{
+  0%{ opacity:.8; transform:scale(.6); }
+  70%, 100%{ opacity:0; transform:scale(1.4); }
+}
+.ponto-rotulo{
+  margin-bottom:16px;
+  font-family:var(--fonte-mono);
+  font-size:10.5px;
+  font-weight:500;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--fg-faint);
+  transition:color .3s var(--ease);
+}
+.ponto.aceso .ponto-rotulo{ color:var(--laser); }
+.ponto-corpo{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  transition:opacity .4s var(--ease-out), transform .4s var(--ease-out);
+}
+.rota.com-movimento .ponto:not(.aceso) .ponto-corpo{ opacity:0; transform:translateY(12px); }
+.ponto-titulo{
+  font-family:var(--fonte-titulo);
+  font-weight:800;
+  font-size:clamp(32px, 4vw, 48px);
+  line-height:.95;
+  text-transform:uppercase;
+}
+.ponto-corpo > p{ color:rgba(236,235,231,.78); max-width:60ch; }
+
+/* ---------- WP-00: abertura */
+.abertura-texto{ display:flex; flex-direction:column; gap:18px; }
+.sobre-titulo{
+  font-family:var(--fonte-titulo);
+  font-weight:800;
+  font-size:clamp(44px, 7.4vw, 104px);
+  line-height:.9;
+  text-transform:uppercase;
+  text-wrap:balance;
+}
+.sobre-lead{ font-size:clamp(17px, 1.5vw, 21px); line-height:1.5; max-width:52ch; }
+.sobre-corpo{ color:var(--fg-soft); max-width:56ch; text-wrap:pretty; }
+.sobre-escudo{ position:relative; align-self:center; width:min(46vw, 180px); aspect-ratio:1 / 1; margin:6px 0; }
+.sobre-escudo img{ position:relative; width:100%; height:100%; }
+.escudo-anel{ position:absolute; inset:-8%; border-radius:50%; border:1px solid rgba(236,235,231,.28); }
+.escudo-anel::after{ content:""; position:absolute; inset:9%; border-radius:50%; border:1px dashed rgba(236,235,231,.16); }
+
+/* ---------- WP-03: valores */
+.rota-valores{ list-style:none; margin:0; padding:0; display:grid; }
+.rota-valores li{
+  display:grid;
+  grid-template-columns:auto minmax(0, 1fr);
+  column-gap:14px;
+  row-gap:4px;
+  align-items:baseline;
+  padding:16px 0;
+  border-bottom:1px solid var(--rule);
+}
+.valor-codigo{
+  grid-row:span 2;
+  font-family:var(--fonte-mono);
+  font-size:11px;
+  letter-spacing:.1em;
+  color:var(--laser);
+}
+.valor-nome{
+  font-family:var(--fonte-titulo);
+  font-weight:800;
+  font-size:clamp(26px, 3vw, 34px);
+  line-height:1;
+  text-transform:uppercase;
+  overflow-wrap:anywhere;
+}
+.rota-valores p{ font-size:14px; color:var(--fg-soft); }
+
+/* ---------- WP-04: lista */
+.rota-lista{ list-style:none; margin:0; padding:0; display:grid; row-gap:12px; }
+.rota-lista li{ position:relative; padding-left:24px; line-height:1.45; }
+.rota-lista li::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:.7em;
+  width:12px;
+  height:1px;
+  background:var(--laser);
+}
+
+/* ---------- destino */
+.rota-destino{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:16px;
+  margin-top:clamp(56px, 8vw, 96px);
+  padding:clamp(40px, 6vw, 72px) clamp(8px, 4vw, 48px);
+  text-align:center;
+}
+.rota-destino::before,
+.rota-destino::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  height:1px;
+  background:var(--rule);
+  transition:transform .6s var(--ease-out);
+}
+.rota-destino::before{ top:0; transform-origin:0 50%; }
+.rota-destino::after{ bottom:0; transform-origin:100% 50%; }
+.rota.com-movimento .rota-destino:not(.alcancado)::before,
+.rota.com-movimento .rota-destino:not(.alcancado)::after{ transform:scaleX(0); }
+.sobre-fecho-titulo{
+  font-family:var(--fonte-titulo);
+  font-weight:800;
+  font-size:clamp(32px, 5.4vw, 72px);
+  line-height:.95;
+  text-transform:uppercase;
+  text-wrap:balance;
+  max-width:20ch;
+}
+.sobre-fecho-sub{ color:var(--fg-soft); max-width:46ch; }
+.rota-destino .pilula{ position:relative; min-height:48px; padding:0 27px; margin-top:6px; }
+.rota-destino .pilula::after{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius:inherit;
+  border:1px solid var(--fg);
+  opacity:0;
+  pointer-events:none;
+}
+.rota.com-movimento .rota-destino.alcancado .pilula::after{ animation:rota-chegou .9s var(--ease-out) .3s 1; }
+@keyframes rota-chegou{
+  0%{ opacity:.7; transform:scale(1); }
+  100%{ opacity:0; transform:scale(1.15, 1.5); }
+}
+
+/* ---------- computador */
+@media (min-width:900px){
+  .rota{ --trilho:20px; --recuo:72px; }
+  .ponto-abertura .ponto-corpo{
+    display:grid;
+    grid-template-columns:minmax(0, 1.3fr) minmax(0, .7fr);
+    align-items:center;
+    gap:clamp(32px, 5vw, 64px);
+  }
+  .sobre-titulo{ font-size:clamp(44px, 6vw, 88px); }
+  .sobre-escudo{ width:min(100%, 300px); justify-self:center; }
+  .rota-valores,
+  .rota-lista{ grid-template-columns:repeat(2, minmax(0, 1fr)); column-gap:40px; }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .ponto.atual .ponto-marca::after{ animation:none; }
+}

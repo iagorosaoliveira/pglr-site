@@ -1,0 +1,313 @@
+/* Arsenal (vitrine C+): mira com a camisa, vizinhas, setas, laser, costas/frente,
+   trilho de miniaturas e a ficha. Celular primeiro; no computador vira duas colunas. */
+
+.arsenal{
+  position:relative;
+  background:var(--bg);
+  padding:clamp(72px, 10vw, 140px) 0 clamp(72px, 9vw, 120px);
+}
+
+/* Topo de seção */
+.secao-topo{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  padding:0 var(--margem);
+  margin-bottom:clamp(28px, 5vw, 64px);
+  text-align:center;
+}
+.secao-titulo{
+  position:relative;
+  padding-bottom:.08em;
+  font-family:var(--fonte-titulo);
+  font-weight:800;
+  font-size:clamp(56px, 11vw, 148px);
+  line-height:.88;
+  letter-spacing:.01em;
+  text-transform:uppercase;
+}
+.secao-titulo::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:-.02em;
+  width:min(46%, 320px);
+  height:3px;
+  background:var(--laser);
+  box-shadow:0 0 14px var(--laser-glow);
+  transform:translateX(-50%);
+}
+
+/* ---------- layout */
+.vitrine{
+  display:grid;
+  gap:22px;
+  max-width:1200px;
+  margin:0 auto;
+  padding:0 max(var(--margem), env(safe-area-inset-right, 0px)) 0 max(var(--margem), env(safe-area-inset-left, 0px));
+}
+.vitrine-palco{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+  min-width:0;
+  padding-top:6px;
+  overflow:hidden;           /* as vizinhas aparecem só pela borda */
+}
+
+/* ---------- mira */
+.mira{
+  position:relative;
+  width:100%;
+  max-width:420px;
+  aspect-ratio:1 / 1;
+  touch-action:pan-y;        /* arrasto horizontal é nosso; rolagem vertical é do navegador */
+  -webkit-user-select:none;
+  user-select:none;
+  cursor:grab;
+}
+.mira:active{ cursor:grabbing; }
+/* foco do teclado: o próprio anel acende (um contorno em volta seria cortado pelo palco) */
+.mira:focus-visible{ outline:none; }
+.mira:focus-visible .mira-anel{ border-color:var(--fg); box-shadow:0 0 0 1px var(--fg); }
+.mira-anel,
+.mira-anel-fino{ position:absolute; border-radius:50%; pointer-events:none; }
+.mira-anel{ inset:6%; border:1px solid rgba(236,235,231,.25); }
+.mira-anel-fino{ inset:10%; border:1px dashed rgba(236,235,231,.16); transition:transform .24s var(--ease-out); }
+.mira-fio{ position:absolute; left:50%; width:1px; height:7%; background:var(--fg); pointer-events:none; }
+.mira-fio-cima{ top:3%; }
+.mira-fio-baixo{ bottom:3%; }
+.mira-alvo{
+  position:absolute;
+  top:0;
+  left:50%;
+  transform:translateX(-50%);
+  font-family:var(--fonte-mono);
+  font-size:10.5px;
+  font-weight:500;
+  letter-spacing:.16em;
+  color:var(--laser);
+  white-space:nowrap;
+}
+.vizinha{
+  position:absolute;
+  top:26%;
+  width:48%;
+  height:48%;
+  object-fit:contain;
+  opacity:.28;
+  pointer-events:none;
+}
+.vizinha-anterior{ left:-28%; }
+.vizinha-proxima{ right:-28%; }
+.camisa{ position:absolute; inset:13%; z-index:1; will-change:transform; }
+.camisa img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  pointer-events:none;
+  -webkit-user-drag:none;
+}
+.mira-laser{ position:absolute; inset:0; z-index:2; opacity:0; pointer-events:none; }
+.mira-laser::before{
+  content:"";
+  position:absolute;
+  left:0; right:0; top:0;
+  height:2px;
+  background:var(--laser);
+  box-shadow:0 0 12px 2px var(--laser-glow);
+}
+.mira-seta{
+  position:absolute;
+  top:50%;
+  z-index:3;
+  display:grid;
+  place-items:center;
+  width:44px;
+  height:44px;
+  margin-top:-22px;
+  padding:0;
+  border:1px solid rgba(236,235,231,.25);
+  border-radius:50%;
+  background:rgba(10,10,10,.6);
+  font-family:var(--fonte-mono);
+  font-size:18px;
+  line-height:1;
+  cursor:pointer;
+  transition:border-color .2s var(--ease), background-color .2s var(--ease), transform .12s var(--ease-out);
+}
+.mira-seta-anterior{ left:0; }
+.mira-seta-proxima{ right:0; }
+.mira-seta:active{ transform:scale(.94); }
+@media (hover:hover) and (pointer:fine){
+  .mira-seta:hover{ border-color:var(--fg); background:rgba(10,10,10,.85); }
+}
+
+/* ---------- costas / frente */
+.lados{
+  display:inline-flex;
+  border:1px solid rgba(236,235,231,.2);
+  border-radius:999px;
+  overflow:hidden;
+}
+.lados button{
+  min-height:36px;
+  padding:0 16px;
+  border:0;
+  background:none;
+  font-family:var(--fonte-mono);
+  font-size:11px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--fg-soft);
+  cursor:pointer;
+  transition:background-color .2s var(--ease), color .2s var(--ease);
+}
+.lados button[aria-pressed="true"]{ background:var(--fg); color:var(--bg); }
+
+/* ---------- trilho de miniaturas (6 por linha; passa para a linha de baixo se houver mais) */
+.trilho{
+  display:grid;
+  grid-template-columns:repeat(6, minmax(0, 1fr));
+  gap:6px;
+  width:100%;
+  max-width:420px;
+}
+.miniatura{
+  height:56px;
+  padding:0;
+  border:0;
+  border-bottom:2px solid rgba(236,235,231,.16);
+  background:transparent;
+  cursor:pointer;
+  transition:background-color .2s var(--ease), border-color .2s var(--ease);
+}
+.miniatura img{
+  display:block;
+  width:100%;
+  height:50px;
+  object-fit:contain;
+  opacity:.45;
+  transition:opacity .2s var(--ease);
+}
+.miniatura[aria-pressed="true"]{ background:#161616; border-bottom-color:var(--laser); }
+.miniatura[aria-pressed="true"] img{ opacity:1; }
+@media (hover:hover) and (pointer:fine){
+  .miniatura:hover img{ opacity:.8; }
+}
+
+/* ---------- ficha */
+.vitrine-info{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+  text-align:center;
+}
+.vitrine-num{ color:var(--laser); }
+.vitrine-nome{
+  font-family:var(--fonte-titulo);
+  font-weight:800;
+  font-size:clamp(38px, 10vw, 64px);
+  line-height:.9;
+  text-transform:uppercase;
+  overflow-wrap:anywhere;
+}
+.vitrine-desc{
+  font-family:var(--fonte-mono);
+  font-size:12px;
+  letter-spacing:.03em;
+  color:var(--fg-soft);
+  max-width:40ch;
+}
+.seletor{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; }
+.seletor[hidden]{ display:none; }
+
+/* Bolinha de cor: área de toque de 36 px, círculo visível de 22 px */
+.bolinha{
+  position:relative;
+  width:36px;
+  height:36px;
+  padding:0;
+  border:0;
+  background:none;
+  cursor:pointer;
+}
+.bolinha::before{
+  content:"";
+  position:absolute;
+  inset:7px;
+  border-radius:50%;
+  background:var(--cor);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);
+}
+.bolinha[aria-pressed="true"]::after{
+  content:"";
+  position:absolute;
+  inset:2px;
+  border-radius:50%;
+  border:1px solid var(--fg);
+}
+.chip{
+  min-height:36px;
+  padding:0 14px;
+  border:1px solid var(--rule);
+  border-radius:999px;
+  background:none;
+  font-family:var(--fonte-mono);
+  font-size:12px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:border-color .3s var(--ease), background-color .3s var(--ease), color .3s var(--ease);
+}
+.chip:hover{ border-color:var(--fg-faint); }
+.chip[aria-pressed="true"]{ background:var(--fg); color:var(--bg); border-color:var(--fg); }
+
+.vitrine-pedir{ width:100%; max-width:420px; min-height:52px; margin-top:8px; }
+
+.sr-only{
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+  white-space:nowrap;
+  border:0;
+}
+
+/* ---------- computador: duas colunas */
+@media (min-width:900px){
+  .vitrine{
+    grid-template-columns:minmax(0, 1.15fr) minmax(0, .85fr);
+    align-items:center;
+    gap:clamp(32px, 5vw, 72px);
+  }
+  .mira,
+  .trilho{ max-width:560px; }
+  .vitrine-info{ align-items:flex-start; text-align:left; }
+  .seletor{ justify-content:flex-start; }
+  .vitrine-pedir{ width:auto; min-width:280px; }
+}
+
+/* ---------- entrada da seção (uma vez; classes postas pelo vitrine.js) */
+.arsenal.com-entrada .secao-titulo::after{
+  transform:translateX(-50%) scaleX(0);
+  transition:transform .6s var(--ease-out) .2s;
+}
+.arsenal.com-entrada.visivel .secao-titulo::after{ transform:translateX(-50%) scaleX(1); }
+.arsenal.com-entrada:not(.visivel) .vitrine-palco,
+.arsenal.com-entrada:not(.visivel) .vitrine-info{ opacity:0; }
+.arsenal.com-entrada.visivel .vitrine-palco{ animation:vitrine-entra .4s var(--ease-out) backwards; }
+.arsenal.com-entrada.visivel .vitrine-info{ animation:vitrine-entra .4s var(--ease-out) .06s backwards; }
+@keyframes vitrine-entra{ from{ opacity:0; transform:translateY(16px); } }
+
+@media (prefers-reduced-motion:reduce){
+  .mira-anel-fino{ transition:none; }
+}
