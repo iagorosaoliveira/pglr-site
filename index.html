@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="intro-ativa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>PGLR Tático · Camisas táticas · São Paulo</title>
+  <meta name="description" content="Camisas táticas feitas em São Paulo. Escolha sua estampa e peça direto no WhatsApp.">
+  <meta name="theme-color" content="#0a0a0a">
+
+  <!-- TROCAR quando hospedar: substitua https://SEU-DOMINIO pelo endereço do site (og:image e og:url precisam de URL absoluta) -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:title" content="PGLR Tático · Camisas táticas">
+  <meta property="og:description" content="Estampas com história, feitas em São Paulo. Escolha a sua e chame no WhatsApp.">
+  <meta property="og:image" content="https://SEU-DOMINIO/assets/video/escudo-16x9.jpg">
+  <meta property="og:url" content="https://SEU-DOMINIO/">
+
+  <link rel="icon" type="image/svg+xml" href="assets/img/logo/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@700;800&family=Inter+Tight:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/cena.css">
+  <link rel="stylesheet" href="css/arsenal.css">
+  <link rel="stylesheet" href="css/sobre.css">
+  <link rel="stylesheet" href="css/intro.css">
+  <link rel="stylesheet" href="css/efeitos.css">
+
+  <script defer src="js/catalogo.js"></script>
+  <script defer src="js/contato.js"></script>
+  <script defer src="js/intro.js"></script>
+  <script defer src="js/cena.js"></script>
+  <script defer src="js/arsenal.js"></script>
+  <script defer src="js/efeitos.js"></script>
+  <script defer src="js/main.js"></script>
+</head>
+<body>
+  <div id="intro" class="intro">
+    <div class="intro-porta intro-porta-cima" aria-hidden="true"></div>
+    <div class="intro-porta intro-porta-baixo" aria-hidden="true"></div>
+
+    <div class="intro-palco" aria-hidden="true">
+      <div class="intro-grade"></div>
+      <span class="intro-marca-dagua">PGLR</span>
+      <i class="intro-linha intro-linha-h"></i>
+      <i class="intro-linha intro-linha-v"></i>
+      <span class="intro-coord" id="intro-coord">X 000 · Y 000</span>
+      <svg class="intro-mira" id="intro-mira" viewBox="-200 -200 400 400"></svg>
+      <i class="intro-varredura"></i>
+    </div>
+
+    <div class="intro-hud" aria-hidden="true">
+      <span class="hud-canto hud-c1"></span><span class="hud-canto hud-c2"></span><span class="hud-canto hud-c3"></span><span class="hud-canto hud-c4"></span>
+      <div class="hud-tl">
+        <p class="hud-titulo">PGLR//TAC-OS <b>v26</b></p>
+        <ol class="hud-log" id="intro-log"></ol>
+      </div>
+      <div class="hud-bl">
+        <p><i class="hud-rec"></i>REC <span id="intro-tempo">00:00:00</span></p>
+        <p>23°33′S · 46°38′W</p>
+      </div>
+      <div class="hud-br">
+        <p id="intro-status">PROCURANDO ALVO</p>
+        <p class="hud-lema" id="intro-lema">SE VIS PACEM · PARA BELLUM</p>
+      </div>
+    </div>
+
+    <button class="intro-pular" type="button">Pular</button>
+    <i class="intro-corte" aria-hidden="true"></i>
+    <div class="intro-logo"><!-- LOGO:INICIO --><svg id="logo-intro" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150" width="150" height="150">
+  <g id="escudo" fill="#ecebe7">
+    <path id="escudo-contorno" fill="none" stroke="#ecebe7" stroke-width="6.28" stroke-linejoin="miter" stroke-miterlimit="4" d="M75.69 29.78 Q96.31 29.78 116.93 36.88 L116.93 63.98 C116.93 96.21 92.27 117.1 75.69 124.65 C59.11 117.1 34.45 96.21 34.45 63.98 L34.45 36.88 Q55.07 29.78 75.69 29.78 Z"/>
+    <g id="capacete">
+      <path d="M71.53 53.45 L71.58 70.74 L61.21 66.84 L62.37 59.82 C62.96 58.56 67.93 55.01 71.53 53.45 Z"/>
+      <path d="M73.14 52.51 Q75.15 51.04 75.15 51.19 L75.15 77.3 L64.28 72.81 C62.68 72.15 63.86 76.46 64.12 76.63 L73.09 82.59 L73.09 100.18 C68.24 97.99 62.44 93.52 58.42 88.61 Q59.94 84.72 60.45 79.95 L69.68 85.49 L70.62 85.29 L60.24 77.62 L58.97 77.14 Q59.66 71.67 61.09 68.16 L73.14 73.22 Z"/>
+      <path d="M80.4 53.45 C84.01 55.01 88.97 58.56 89.56 59.82 L90.73 66.84 L80.36 70.74 Z"/>
+      <path d="M78.8 52.51 L78.8 73.22 L90.85 68.16 Q92.27 71.67 92.96 77.14 L91.7 77.62 L81.31 85.29 L82.25 85.49 L91.48 79.95 Q91.99 84.72 93.51 88.61 C89.5 93.52 83.7 97.99 78.84 100.18 L78.84 82.59 L87.81 76.63 C88.08 76.46 89.26 72.15 87.65 72.81 L76.78 77.3 L76.78 51.19 Q76.78 51.04 78.8 52.51 Z"/>
+    </g>
+    <g id="cruz-1"><path d="M74.62 36.77 L77.38 36.77 L77.38 47.88 L74.62 47.88 Z M63.93 47.29 C72.93 41.77 78.87 41.77 87.88 47.29 C77.72 44.2 74.08 44.2 63.93 47.29 Z"/></g>
+    <g id="cruz-2"><path d="M97.45 72.55 L108.47 72.55 L108.47 75.22 L97.45 75.22 Z M98.28 62.51 C103.91 69.66 103.91 78.47 98.28 85.62 C101.59 75.76 101.59 72.36 98.28 62.51 Z"/></g>
+    <g id="cruz-3"><path d="M74.61 103.19 L77.36 103.19 L77.36 114.42 L74.61 114.42 Z M64.12 103.87 C74.25 107.13 77.6 107.13 87.74 103.87 C79.44 109.47 72.41 109.47 64.12 103.87 Z"/></g>
+    <g id="cruz-4"><path d="M43.31 72.58 L54.67 72.58 L54.67 75.29 L43.31 75.29 Z M53.66 62.61 C50.18 72.18 50.18 75.94 53.66 85.5 C47.94 79.24 47.94 68.87 53.66 62.61 Z"/></g>
+  </g>
+</svg><!-- LOGO:FIM --></div>
+    <div class="intro-carga">
+      <div class="intro-pente" id="intro-pente" aria-hidden="true"></div>
+      <p class="intro-num" aria-hidden="true"><span id="intro-pct">000</span><small>%</small></p>
+      <p id="intro-legenda" class="rotulo" role="status">MUNICIANDO</p>
+    </div>
+  </div>
+
+  <i class="medidor" id="medidor"></i>
+
+  <header class="cabecalho">
+    <a href="#topo" class="marca">
+      <img id="logo-cabecalho" src="assets/img/logo/pglr.svg" alt="" width="30" height="30">
+      <span>PGLR TÁTICO</span>
+    </a>
+    <nav class="nav" aria-label="Principal">
+      <a href="#arsenal">Arsenal</a>
+      <a href="#sobre">Sobre</a>
+      <a class="pilula" data-whatsapp>WhatsApp</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="trilha" id="topo">
+      <div class="cena">
+        <canvas id="campo" aria-hidden="true"></canvas>
+        <div class="veu"></div>
+        <div class="grao"></div>
+        <div class="escurecer"></div>
+
+        <div class="cena-hud" aria-hidden="true">
+          <span class="hud-regua"></span>
+          <span class="hud-alvo"><i></i><b>ALVO</b></span>
+        </div>
+
+        <div class="paineis">
+          <section class="painel" data-painel>
+            <div class="painel-miolo">
+              <span class="moldura m1"></span><span class="moldura m2"></span><span class="moldura m3"></span><span class="moldura m4"></span>
+              <p class="rotulo olho"><b>01 / 03</b><span>PGLR TÁTICO</span><span>·</span><span>SÃO PAULO</span></p>
+              <h1>Se vis pacem,<br>para bellum.</h1>
+              <p class="sub">Camisas táticas pra quem leva a sério o que veste.</p>
+              <div class="cta"><a class="pilula" href="#arsenal">Ver o arsenal</a></div>
+            </div>
+          </section>
+          <section class="painel" data-painel>
+            <div class="painel-miolo">
+              <span class="moldura m1"></span><span class="moldura m2"></span><span class="moldura m3"></span><span class="moldura m4"></span>
+              <p class="rotulo olho"><b>02 / 03</b><span>CADA ESTAMPA TEM UMA MISSÃO</span></p>
+              <h1>Feita pra<br>quem não recua.</h1>
+              <p class="sub">Da FEB na Itália às ruas de São Paulo: homenagens que você veste no peito e nas costas.</p>
+              <div class="cta"><a class="pilula" href="#sobre">Conhecer a PGLR</a></div>
+            </div>
+          </section>
+          <section class="painel" data-painel>
+            <div class="painel-miolo">
+              <span class="moldura m1"></span><span class="moldura m2"></span><span class="moldura m3"></span><span class="moldura m4"></span>
+              <p class="rotulo olho"><b>03 / 03</b><span>PRONTO PRA MISSÃO</span></p>
+              <h1>Escolha.<br>Chame no rádio.</h1>
+              <p class="sub">Escolheu a estampa? O pedido é fechado direto com o Guilherme no WhatsApp.</p>
+              <div class="cta"><a class="pilula" href="#arsenal">Ver o arsenal</a></div>
+            </div>
+          </section>
+        </div>
+
+        <nav class="capitulos" aria-label="Capítulos da abertura">
+          <button type="button" data-capitulo="0" aria-label="Capítulo 1"><span>01</span></button>
+          <button type="button" data-capitulo="1" aria-label="Capítulo 2"><span>02</span></button>
+          <button type="button" data-capitulo="2" aria-label="Capítulo 3"><span>03</span></button>
+        </nav>
+
+        <div class="cena-rodape" aria-hidden="true">
+          <span>23°33′S · 46°38′W</span>
+          <span class="cena-rodape-meio">Pedidos direto no WhatsApp · Feito em SP</span>
+          <span>FASE <b id="fase-num">01</b> · <span id="fase-nome">RECONHECIMENTO</span></span>
+        </div>
+      </div>
+    </section>
+
+    <div class="faixa" aria-hidden="true">
+      <div class="faixa-trilho" id="faixa">
+        <span>SE VIS PACEM</span><i>✕</i><span>PARA BELLUM</span><i>✕</i><span>FEITO EM SÃO PAULO</span><i>✕</i><span>PGLR TÁTICO</span><i>✕</i>
+      </div>
+    </div>
+
+    <section id="arsenal" class="arsenal" aria-labelledby="arsenal-titulo">
+      <div class="secao-topo">
+        <p class="rotulo" data-decodificar>VITRINE · PEDIDO PELO WHATSAPP</p>
+        <h2 id="arsenal-titulo" class="secao-titulo" data-letras>ARSENAL</h2>
+        <p class="rotulo" id="arsenal-contagem" data-decodificar></p>
+      </div>
+      <div id="arsenal-grade" class="arsenal-grade"></div>
+    </section>
+
+    <section id="sobre" class="sobre" aria-labelledby="sobre-titulo">
+      <div class="sobre-abertura">
+        <div class="sobre-texto">
+          <p class="rotulo" data-decodificar>QUEM SOMOS · PGLR TÁTICO</p>
+          <h2 id="sobre-titulo" class="sobre-titulo" data-palavras>Sua base de confiança no mundo tático.</h2>
+          <p class="sobre-lead">Bem-vindo à PGLR TÁTICO, a sua base de confiança no mundo tático! Aqui não somos apenas uma loja: somos uma equipe movida por disciplina, estratégia e paixão pelo universo tático.</p>
+          <p class="sobre-corpo">Nosso objetivo é simples: oferecer equipamentos de alta qualidade, que entreguem resistência, funcionalidade e estilo, seja para uso profissional, treinamentos, operações, aventuras ao ar livre ou até no seu dia a dia.</p>
+        </div>
+        <figure class="sobre-escudo revelar">
+          <svg class="sobre-mira" viewBox="-100 -100 200 200" aria-hidden="true">
+            <g class="sm-gira">
+              <circle r="96" class="sm-anel"/>
+              <path class="sm-marcas" d="M0 -96V-86M0 86V96M-96 0H-86M86 0H96"/>
+            </g>
+            <circle r="84" class="sm-fino"/>
+            <path class="sm-travas" d="M-70 -50V-70H-50M50 -70H70V-50M70 50V70H50M-50 70H-70V50"/>
+          </svg>
+          <img src="assets/img/logo/pglr.svg" alt="" width="150" height="150">
+        </figure>
+      </div>
+
+      <div class="sobre-blocos">
+        <article class="bloco revelar">
+          <span class="canto canto-1"></span><span class="canto canto-2"></span><span class="canto canto-3"></span><span class="canto canto-4"></span>
+          <p class="rotulo" data-decodificar>01 · MISSÃO</p><span class="bloco-num" aria-hidden="true">01</span>
+          <h3 class="bloco-titulo">Nossa Missão</h3>
+          <p>Fornecer produtos que unam durabilidade, eficiência e credibilidade, acompanhando nossos clientes em cada desafio.</p>
+        </article>
+        <article class="bloco revelar">
+          <span class="canto canto-1"></span><span class="canto canto-2"></span><span class="canto canto-3"></span><span class="canto canto-4"></span>
+          <p class="rotulo" data-decodificar>02 · VISÃO</p><span class="bloco-num" aria-hidden="true">02</span>
+          <h3 class="bloco-titulo">Nossa Visão</h3>
+          <p>Ser referência nacional no setor tático, construindo uma comunidade sólida e respeitada, onde cada cliente é também um parceiro de missão.</p>
+        </article>
+      </div>
+
+      <div class="sobre-valores">
+        <p class="rotulo" data-decodificar>03 · NOSSOS VALORES</p>
+        <ul class="valores">
+          <li class="revelar"><h3 class="valor-nome">Confiança</h3><p>Transparência em cada venda e suporte.</p></li>
+          <li class="revelar"><h3 class="valor-nome">Qualidade</h3><p>Seleção criteriosa de cada produto.</p></li>
+          <li class="revelar"><h3 class="valor-nome">Comprometimento</h3><p>Respeito a quem confia na nossa marca.</p></li>
+          <li class="revelar"><h3 class="valor-nome">Comunidade</h3><p>Não vendemos apenas, construímos laços.</p></li>
+        </ul>
+      </div>
+
+      <div class="sobre-lista">
+        <p class="rotulo" data-decodificar>04 · COM A GENTE</p>
+        <h3 class="bloco-titulo">Com a gente você vai encontrar:</h3>
+        <ul class="lista-mira revelar-grupo">
+          <li>Novidades e lançamentos em primeira mão</li>
+          <li>Ofertas e promoções exclusivas para a comunidade</li>
+          <li>Atendimento rápido e sem enrolação</li>
+          <li>Espaço para troca de ideias e experiências</li>
+        </ul>
+      </div>
+
+      <div class="sobre-fecho revelar">
+        <p class="sobre-fecho-titulo" data-palavras>PGLR TÁTICO é mais do que comércio, é uma missão compartilhada.</p>
+        <p class="sobre-fecho-sub">Se você valoriza estratégia, preparo e qualidade, então está no lugar certo.</p>
+        <a class="pilula" data-whatsapp>Chamar no WhatsApp</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <img src="assets/img/logo/pglr.svg" alt="PGLR Tático" width="44" height="44">
+    <p class="rodape-nome">PGLR Tático · São Paulo</p>
+    <nav class="rodape-links" aria-label="Contato">
+      <a data-whatsapp>WhatsApp</a>
+      <a data-instagram>@pglrtatico</a>
+    </nav>
+    <p class="rodape-direitos">© 2026 PGLR Tático</p>
+  </footer>
+
+  <a class="whats-flutuante" data-whatsapp aria-label="Falar no WhatsApp">
+    <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+      <path d="M12 2.5a9.5 9.5 0 0 0-8.2 14.3L2.5 21.5l4.8-1.3A9.5 9.5 0 1 0 12 2.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+      <path d="M8.7 7.3c.3-.3.8-.3 1 .1l1 1.8c.2.3.1.7-.2 1l-.6.6a6.6 6.6 0 0 0 3 3l.6-.6c.3-.3.7-.4 1-.2l1.8 1c.4.2.4.7.1 1l-.8.8c-.6.6-1.6.7-2.4.3a10.6 10.6 0 0 1-4.9-4.9c-.4-.8-.3-1.8.3-2.4z" fill="currentColor"/>
+    </svg>
+  </a>
+</body>
+</html>

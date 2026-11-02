@@ -1,0 +1,91 @@
+/* Tokens, reset, tipografia e peças compartilhadas (pílula, grão). */
+:root{
+  --bg:#0a0a0a;
+  --bg-2:#141414;
+  --fg:#ecebe7;
+  --fg-soft:rgba(236,235,231,.66);
+  --fg-faint:rgba(236,235,231,.40);
+  --rule:rgba(236,235,231,.14);
+  --accent:#ffffff;
+  --ease:cubic-bezier(.22,.61,.36,1);
+
+  --fonte-titulo:'Big Shoulders Stencil Display','Impact','Arial Narrow',sans-serif;
+  --fonte-mono:'JetBrains Mono',ui-monospace,'Consolas',monospace;
+  --fonte-corpo:'Inter Tight','Helvetica Neue',Helvetica,Arial,sans-serif;
+
+  --margem:clamp(16px, 3.4vw, 44px);
+  color-scheme:dark;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--fonte-corpo);
+  font-weight:400;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+h1,h2,h3,p,figure{ margin:0; }
+img,svg,video{ display:block; max-width:100%; }
+a{ color:inherit; }
+button{ font:inherit; color:inherit; }
+::selection{ background:var(--fg); color:var(--bg); }
+:focus-visible{ outline:2px solid var(--fg); outline-offset:3px; }
+
+@media (prefers-reduced-motion:reduce){
+  html{ scroll-behavior:auto; }
+}
+
+/* Rótulo técnico em mono, caixa alta */
+.rotulo{
+  font-family:var(--fonte-mono);
+  font-size:12px;
+  font-weight:500;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--fg-soft);
+}
+
+/* Botão principal: branco sólido, texto preto. O -webkit-text-fill-color forçado
+   impede que a cor herdada do link vaze para o texto no Safari do celular. */
+.pilula{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:40px;
+  padding:0 21px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.12);
+  background:var(--accent);
+  color:#0a0a0a;
+  -webkit-text-fill-color:#0a0a0a;
+  font-family:var(--fonte-mono);
+  font-size:13px;
+  font-weight:500;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  text-decoration:none;
+  white-space:nowrap;
+  cursor:pointer;
+  transition:transform .4s var(--ease), background .3s var(--ease);
+}
+.pilula:hover,.pilula:focus-visible{
+  transform:translateY(-2px);
+  background:#d9d8d4;
+}
+.pilula:focus-visible{ outline:2px solid var(--fg); outline-offset:2px; }
+
+/* Grão de filme: ruído SVG fino para o preto chapado não formar faixas */
+.grao{
+  position:absolute;
+  inset:-50%;
+  opacity:.09;
+  mix-blend-mode:screen;
+  pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='.5'/></svg>");
+}

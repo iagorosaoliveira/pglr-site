@@ -1,0 +1,425 @@
+/* Intro / carregamento — "aquisição de alvo".
+   Um HUD tático liga, a mira caça o alvo pela tela e trava no centro, o escudo é
+   desenhado e as quatro cruzes batem como impactos. No fim, um corte de laser abre
+   a tela como uma porta blindada e o escudo voa até o cabeçalho.
+   A intro também é a tela de carregamento do vídeo (o pente enche com o download). */
+
+:root{
+  --laser:#ff3b2f;
+  --laser-glow:rgba(255,59,47,.55);
+  --ease-seco:cubic-bezier(.7,0,.2,1);
+  --ease-saida:cubic-bezier(.16,1,.3,1);
+}
+
+.intro{
+  position:fixed;
+  inset:0;
+  z-index:90;
+  overflow:hidden;
+  color:var(--fg);
+  font-family:var(--fonte-mono);
+  /* o fundo de verdade são as duas portas; o resto fica transparente para a saída */
+  background:transparent;
+}
+.intro[hidden]{ display:none; }
+.intro.oculta{ visibility:hidden; opacity:0; pointer-events:none; }
+
+/* flash do disparo (animado pelo intro.js) */
+.intro::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:9;
+  background:#fff;
+  opacity:0;
+  pointer-events:none;
+}
+
+/* ---------- portas blindadas */
+.intro-porta{
+  position:absolute;
+  left:0; right:0;
+  z-index:1;
+  height:50.5%;
+  background:var(--bg);
+  will-change:transform;
+}
+.intro-porta-cima{ top:0; }
+.intro-porta-baixo{ bottom:0; }
+/* faixa de alerta na borda que se abre (só aparece na saída) */
+.intro-porta::after{
+  content:"";
+  position:absolute;
+  left:0; right:0;
+  height:10px;
+  opacity:0;
+  background:repeating-linear-gradient(-45deg, rgba(236,235,231,.55) 0 7px, transparent 7px 16px);
+}
+.intro-porta-cima::after{ bottom:0; box-shadow:0 1px 0 var(--laser); }
+.intro-porta-baixo::after{ top:0; box-shadow:0 -1px 0 var(--laser); }
+.intro.saindo .intro-porta::after{ opacity:1; transition:opacity .12s linear; }
+
+/* linha de corte do laser no meio da tela */
+.intro-corte{
+  position:absolute;
+  left:0; right:0; top:50%;
+  z-index:6;
+  height:2px;
+  margin-top:-1px;
+  background:var(--laser);
+  box-shadow:0 0 12px 2px var(--laser-glow), 0 0 40px 6px rgba(255,59,47,.25);
+  transform:scaleX(0);
+  opacity:0;
+  pointer-events:none;
+}
+
+/* ---------- palco: grade, marca d'água, linhas da mira e retículo */
+.intro-palco{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+  --mx:50vw;
+  --my:50vh;
+}
+.intro-grade{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  background-image:
+    linear-gradient(rgba(236,235,231,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(236,235,231,.055) 1px, transparent 1px);
+  background-size:48px 48px;
+  background-position:center center;
+  -webkit-mask-image:radial-gradient(70% 70% at 50% 50%, #000 0%, transparent 100%);
+          mask-image:radial-gradient(70% 70% at 50% 50%, #000 0%, transparent 100%);
+}
+.intro-marca-dagua{
+  position:absolute;
+  left:50%; top:50%;
+  font-family:var(--fonte-titulo);
+  font-weight:800;
+  font-size:min(42vw, 72vh);
+  line-height:.8;
+  letter-spacing:-.01em;
+  color:transparent;
+  -webkit-text-stroke:1px rgba(236,235,231,.10);
+  transform:translate(-50%,-50%);
+  white-space:nowrap;
+  opacity:0;
+  user-select:none;
+}
+
+/* linhas que caçam o alvo: posicionadas por --mx/--my (rAF do intro.js) */
+.intro-linha{
+  position:absolute;
+  left:0; top:0;
+  background:rgba(236,235,231,.32);
+  opacity:0;
+  transition:background-color .2s linear, box-shadow .2s linear;
+}
+.intro-linha-h{ width:100%; height:1px; transform:translate3d(0,var(--my),0); }
+.intro-linha-v{ width:1px; height:100%; transform:translate3d(var(--mx),0,0); }
+.intro-coord{
+  position:absolute;
+  left:0; top:0;
+  font-size:10.5px;
+  letter-spacing:.12em;
+  color:var(--fg-soft);
+  white-space:nowrap;
+  transform:translate3d(calc(var(--mx) + 10px), calc(var(--my) + 8px), 0);
+  opacity:0;
+}
+.travado .intro-linha{ background:var(--laser); box-shadow:0 0 8px var(--laser-glow); }
+.travado .intro-coord{ color:var(--laser); }
+
+/* retículo central (montado pelo intro.js) */
+.intro-mira{
+  position:absolute;
+  left:50%; top:50%;
+  width:min(92vw, 470px);
+  height:auto;
+  aspect-ratio:1;
+  overflow:visible;
+  transform:translate(-50%,-50%);
+  color:var(--fg);
+}
+.intro-mira .anel{ fill:none; stroke:rgba(236,235,231,.42); stroke-width:1; }
+.intro-mira .anel-fino{ fill:none; stroke:rgba(236,235,231,.22); stroke-width:1; stroke-dasharray:2 7; }
+.intro-mira .marcas line{ stroke:rgba(236,235,231,.38); stroke-width:1; }
+.intro-mira .marcas line.maior{ stroke:rgba(236,235,231,.75); }
+.intro-mira .fios line{ stroke:var(--fg); stroke-width:1.2; }
+.intro-mira .travas path{ fill:none; stroke:var(--fg); stroke-width:2; transition:stroke .15s linear; }
+.intro-mira text{
+  font-family:var(--fonte-mono);
+  font-size:9px;
+  letter-spacing:.14em;
+  fill:var(--fg-soft);
+}
+.intro-mira .girar{ transform-origin:0 0; animation:intro-girar 18s linear infinite; }
+.intro-mira .girar-contra{ transform-origin:0 0; animation:intro-girar 11s linear infinite reverse; }
+.travado .intro-mira .travas path{ stroke:var(--laser); filter:drop-shadow(0 0 4px var(--laser-glow)); }
+.travado .intro-mira text.leitura{ fill:var(--laser); }
+@keyframes intro-girar{ to{ transform:rotate(360deg); } }
+
+/* barra de varredura que cruza a tela uma vez */
+.intro-varredura{
+  position:absolute;
+  left:0; right:0; top:0;
+  height:120px;
+  background:linear-gradient(to bottom, rgba(236,235,231,0) 0%, rgba(236,235,231,.06) 70%, rgba(236,235,231,.5) 98%, rgba(236,235,231,0) 100%);
+  transform:translateY(-130px);
+  opacity:0;
+}
+
+/* ondas de impacto das cruzes (criadas pelo intro.js) */
+.intro-onda{
+  position:absolute;
+  left:50%; top:50%;
+  width:min(46vw, 230px);
+  aspect-ratio:1;
+  margin:calc(min(46vw, 230px) / -2) 0 0 calc(min(46vw, 230px) / -2);
+  border-radius:50%;
+  border:1.5px solid var(--fg);
+  opacity:0;
+  pointer-events:none;
+}
+.intro-onda.forte{ border-color:var(--laser); box-shadow:0 0 18px var(--laser-glow), inset 0 0 18px var(--laser-glow); }
+
+/* ---------- HUD nos cantos */
+.intro-hud{
+  position:absolute;
+  inset:0;
+  z-index:3;
+  pointer-events:none;
+  font-size:11px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--fg-soft);
+  --hud-x:max(18px, calc(env(safe-area-inset-left, 0px) + 14px));
+  --hud-y:max(18px, calc(env(safe-area-inset-top, 0px) + 14px));
+  --hud-yb:max(18px, calc(env(safe-area-inset-bottom, 0px) + 14px));
+}
+.intro-hud p{ margin:0; }
+.hud-canto{
+  position:absolute;
+  width:22px; height:22px;
+  border:0 solid rgba(236,235,231,.55);
+  opacity:0;
+}
+.hud-c1{ top:10px; left:10px; border-top-width:1.5px; border-left-width:1.5px; }
+.hud-c2{ top:10px; right:10px; border-top-width:1.5px; border-right-width:1.5px; }
+.hud-c3{ bottom:10px; left:10px; border-bottom-width:1.5px; border-left-width:1.5px; }
+.hud-c4{ bottom:10px; right:10px; border-bottom-width:1.5px; border-right-width:1.5px; }
+
+.hud-tl{ position:absolute; top:var(--hud-y); left:calc(var(--hud-x) + 16px); max-width:calc(100% - 150px); }
+.hud-titulo{ color:var(--fg); opacity:0; }
+.hud-titulo b{ font-weight:500; color:var(--laser); }
+.hud-log{
+  list-style:none;
+  margin:10px 0 0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  font-size:10.5px;
+  letter-spacing:.08em;
+  text-transform:none;
+}
+.hud-log li{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hud-log li::before{ content:"› "; color:var(--fg-faint); }
+.hud-log li.ok::after{ content:" [OK]"; color:var(--fg); }
+.hud-log li.alerta{ color:var(--laser); }
+
+.hud-bl,
+.hud-br{
+  position:absolute;
+  bottom:var(--hud-yb);
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  opacity:0;
+}
+.hud-bl{ left:calc(var(--hud-x) + 16px); }
+.hud-br{ right:calc(var(--hud-x) + 16px); text-align:right; align-items:flex-end; }
+.hud-rec{
+  display:inline-block;
+  width:7px; height:7px;
+  margin-right:8px;
+  border-radius:50%;
+  background:var(--laser);
+  box-shadow:0 0 8px var(--laser-glow);
+  vertical-align:1px;
+  animation:intro-piscar 1s steps(1,end) infinite;
+}
+#intro-status{ color:var(--fg); }
+.travado #intro-status{ color:var(--laser); }
+.hud-lema{ color:var(--fg-faint); }
+@keyframes intro-piscar{ 50%{ opacity:.15; } }
+
+/* ---------- escudo */
+.intro-logo{
+  position:absolute;
+  left:50%; top:50%;
+  z-index:5;
+  transform:translate(-50%,-50%);
+}
+#logo-intro{
+  position:relative;
+  width:min(52vw, 260px);
+  height:auto;
+  overflow:visible;
+  transform-origin:50% 50%;
+}
+#logo-intro #capacete,
+#logo-intro [id^="cruz-"]{ opacity:0; }
+#logo-intro #capacete,
+#logo-intro [id^="cruz-"]{ transform-box:fill-box; transform-origin:center; }
+
+/* ---------- pente de munição (carregamento) */
+.intro-carga{
+  position:absolute;
+  left:50%;
+  bottom:max(70px, calc(env(safe-area-inset-bottom, 0px) + 62px));
+  z-index:4;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  transform:translateX(-50%);
+  opacity:0;
+}
+.intro-pente{ display:flex; gap:3px; }
+.intro-pente i{
+  display:block;
+  width:4px;
+  height:14px;
+  border-radius:1px 1px 0 0;
+  background:rgba(236,235,231,.14);
+  transition:background-color .15s linear, box-shadow .15s linear, transform .15s var(--ease);
+}
+.intro-pente i.cheio{ background:var(--fg); transform:translateY(-2px); }
+.intro-pente.completo i{ background:var(--laser); box-shadow:0 0 6px var(--laser-glow); }
+.intro-num{
+  margin:4px 0 0;
+  font-family:var(--fonte-titulo);
+  font-weight:800;
+  font-size:44px;
+  line-height:1;
+  letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;
+  color:var(--fg);
+}
+.intro-num small{ font-size:.42em; margin-left:2px; color:var(--fg-faint); vertical-align:top; }
+.intro-carga .rotulo{ font-size:10.5px; color:var(--fg-faint); letter-spacing:.24em; }
+
+/* ---------- pular */
+.intro-pular{
+  position:absolute;
+  top:max(16px, calc(env(safe-area-inset-top, 0px) + 12px));
+  right:max(16px, calc(env(safe-area-inset-right, 0px) + 12px));
+  z-index:8;
+  min-height:40px;
+  padding:0 18px;
+  border:1px solid var(--rule);
+  border-radius:999px;
+  background:rgba(10,10,10,.6);
+  font-family:var(--fonte-mono);
+  font-size:12px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--fg-soft);
+  cursor:pointer;
+  transition:color .3s var(--ease), border-color .3s var(--ease);
+}
+.intro-pular:hover{ color:var(--fg); border-color:var(--fg-faint); }
+.intro-pular[hidden]{ display:none; }
+
+/* ---------- telas menores */
+@media (max-width:600px){
+  .intro-hud{ font-size:9.5px; letter-spacing:.1em; }
+  .hud-log{ font-size:9.5px; }
+  .hud-log li:nth-child(n+5){ display:none; }
+  .hud-lema{ display:none; }
+  .intro-num{ font-size:36px; }
+  .intro-pente{ gap:2px; }
+  .intro-pente i{ width:3px; height:12px; }
+}
+@media (max-height:560px) and (orientation:landscape){
+  #logo-intro{ width:min(34vh, 200px); }
+  .intro-mira{ width:min(78vh, 380px); }
+  .intro-onda{ width:min(30vh, 160px); margin:calc(min(30vh, 160px) / -2) 0 0 calc(min(30vh, 160px) / -2); }
+  .hud-log{ display:none; }
+  .intro-carga{ bottom:max(14px, env(safe-area-inset-bottom, 0px)); flex-direction:row; gap:12px; }
+  .intro-num{ font-size:26px; margin:0; }
+}
+
+/* travas da mira pulsando enquanto espera o vídeo */
+.travado .intro-mira .travas path{ animation:intro-pulso 1.2s ease-in-out infinite; }
+@keyframes intro-pulso{ 50%{ stroke-opacity:.4; } }
+
+/* Movimento reduzido: tudo já montado, sem caça nem impactos */
+.intro-pronta .intro-grade,
+.intro-pronta .intro-marca-dagua,
+.intro-pronta .hud-canto,
+.intro-pronta .hud-titulo,
+.intro-pronta .hud-bl,
+.intro-pronta .hud-br,
+.intro-pronta .intro-carga,
+.intro-pronta #logo-intro #capacete,
+.intro-pronta #logo-intro [id^="cruz-"]{ opacity:1; }
+.reduzido .intro-linha,
+.reduzido .intro-coord,
+.reduzido .intro-varredura{ display:none; }
+.reduzido .intro-mira .girar,
+.reduzido .intro-mira .girar-contra,
+.reduzido .hud-rec,
+.reduzido .intro-mira .travas path{ animation:none; }
+
+/* Enquanto a intro está ativa: sem rolagem, logo do cabeçalho e botão flutuante escondidos */
+.intro-ativa,
+.intro-ativa body{ overflow:hidden; }
+.intro-ativa #logo-cabecalho{ visibility:hidden; }
+.intro-ativa .whats-flutuante{ opacity:0; pointer-events:none; }
+.whats-flutuante{ transition:opacity .4s var(--ease), transform .4s var(--ease); }
+
+/* ---------- entrada do primeiro painel quando as portas abrem */
+.intro-entrada .painel:first-child .rotulo{
+  animation:intro-ent-wipe .7s var(--ease-saida) .25s backwards;
+}
+.intro-entrada .painel:first-child h1{
+  animation:intro-ent-carimbo .9s var(--ease-saida) .35s backwards;
+}
+.intro-entrada .painel:first-child .sub{
+  animation:intro-ent-sobe .8s var(--ease-saida) .7s backwards;
+}
+.intro-entrada .painel:first-child .cta{
+  animation:intro-ent-sobe .8s var(--ease-saida) .85s backwards;
+}
+.intro-entrada .cabecalho .nav{
+  animation:intro-ent-desce .7s var(--ease-saida) .5s backwards;
+}
+@keyframes intro-ent-wipe{
+  from{ clip-path:inset(0 100% 0 0); opacity:0; }
+  20%{ opacity:.8; }
+  to{ clip-path:inset(0 0 0 0); }
+}
+@keyframes intro-ent-carimbo{
+  0%{ opacity:0; transform:scale(1.35) translateY(10px); filter:blur(14px); }
+  55%{ opacity:1; transform:scale(.985) translateY(0); filter:blur(0); }
+  100%{ opacity:1; transform:none; filter:none; }
+}
+/* sem opacidade no fim: cada elemento volta à sua própria opacidade */
+@keyframes intro-ent-sobe{
+  from{ opacity:0; transform:translateY(22px); }
+  to{ transform:none; }
+}
+@keyframes intro-ent-desce{
+  from{ opacity:0; transform:translateY(-14px); }
+  to{ opacity:1; transform:none; }
+}
+
+/* leituras do retículo só aparecem junto com ele */
+.intro-mira text{ opacity:0; }
+.reduzido .intro-mira text,
+.intro-pronta .intro-mira text{ opacity:1; }

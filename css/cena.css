@@ -1,0 +1,413 @@
+/* Cena da rolagem: a animação de partículas (canvas, cena.js) fica presa na tela e a
+   rolagem a avança e volta, enquanto três painéis entram e saem por cima.
+   Tudo o que mexe aqui é pintado pelo loop rAF do cena.js (sem transition, de propósito):
+   ele escreve opacity/transform nos painéis e as variáveis --e (entrada 0..1),
+   --s (saída 0..1) e --p (progresso da trilha 0..1). */
+
+.trilha{
+  position:relative;
+  height:560vh;
+  min-height:3200px;
+}
+.cena{
+  position:sticky;
+  top:0;
+  height:100vh;
+  height:100svh;
+  overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 45%, #141414 0%, var(--bg) 70%);
+  --p:0;
+}
+.cena canvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+}
+
+/* Véu escuro, mais forte em cima e embaixo, onde ficam cabeçalho e rodapé da cena */
+.veu{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(to bottom, rgba(10,10,10,.62) 0%, rgba(10,10,10,.12) 22%, rgba(10,10,10,.12) 78%, rgba(10,10,10,.70) 100%),
+    radial-gradient(100% 80% at 50% 48%, rgba(10,10,10,0) 0%, rgba(10,10,10,.34) 100%),
+    rgba(10,10,10,.20);
+}
+/* linhas de varredura bem finas por cima do vídeo */
+.veu::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(to bottom, rgba(0,0,0,.16) 0 1px, transparent 1px 3px);
+  opacity:.5;
+}
+.escurecer{
+  position:absolute;
+  inset:0;
+  background:var(--bg);
+  opacity:0;
+  pointer-events:none;
+}
+
+/* ---------- HUD da cena */
+.cena-hud{
+  position:absolute;
+  inset:0;
+  z-index:15;
+  pointer-events:none;
+}
+/* régua de altímetro na borda esquerda: os traços correm com a rolagem */
+.hud-regua{
+  position:absolute;
+  left:max(14px, env(safe-area-inset-left, 0px));
+  top:22%;
+  bottom:22%;
+  width:14px;
+  opacity:.5;
+  background:
+    repeating-linear-gradient(to bottom, rgba(236,235,231,.55) 0 1px, transparent 1px 10px) right top / 6px 100%,
+    repeating-linear-gradient(to bottom, rgba(236,235,231,.85) 0 1px, transparent 1px 50px) right top / 14px 100%;
+  background-repeat:no-repeat;
+  background-position-y:calc(var(--p) * -1200px), calc(var(--p) * -1200px);
+  -webkit-mask-image:linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+          mask-image:linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+}
+.hud-regua::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  right:-10px;
+  border:5px solid transparent;
+  border-right-color:var(--laser, #ff3b2f);
+  transform:translateY(-50%);
+}
+/* retículo central que aparece nas zonas mortas, quando só o vídeo está na tela */
+.hud-alvo{
+  position:absolute;
+  left:50%; top:50%;
+  width:clamp(120px, 18vw, 220px);
+  aspect-ratio:1;
+  opacity:0;
+  transform:translate(-50%,-50%) rotate(calc(var(--p) * 270deg));
+}
+.hud-alvo i,
+.hud-alvo::before,
+.hud-alvo::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+}
+.hud-alvo i{ border:1px solid rgba(236,235,231,.55); }
+.hud-alvo::before{
+  inset:-14px;
+  border:1px dashed rgba(236,235,231,.25);
+}
+.hud-alvo::after{
+  inset:auto;
+  left:50%; top:-26px; bottom:-26px;
+  width:1px;
+  border-radius:0;
+  background:linear-gradient(rgba(236,235,231,.7) 0 30px, transparent 30px calc(100% - 30px), rgba(236,235,231,.7) calc(100% - 30px));
+}
+.hud-alvo b{
+  position:absolute;
+  left:calc(100% + 18px);
+  top:50%;
+  font-family:var(--fonte-mono);
+  font-size:10.5px;
+  font-weight:500;
+  letter-spacing:.2em;
+  color:var(--laser, #ff3b2f);
+  transform:translateY(-50%) rotate(calc(var(--p) * -270deg));
+}
+
+/* Barra de progresso da trilha + marcações de mira a 1/3 e 2/3 */
+.medidor{
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:50;
+  height:2px;
+  width:100%;
+  transform:scaleX(0);
+  transform-origin:0 50%;
+  background:var(--fg);
+  opacity:.55;
+  transition:opacity .3s linear;
+}
+body::after{
+  content:"";
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height:6px;
+  z-index:50;
+  pointer-events:none;
+  background:
+    linear-gradient(var(--rule), var(--rule)) calc(100% / 3) 0 / 1px 100% no-repeat,
+    linear-gradient(var(--rule), var(--rule)) calc(200% / 3) 0 / 1px 100% no-repeat;
+  transition:opacity .3s linear;
+}
+.alem-da-trilha .medidor,
+.alem-da-trilha body::after{ opacity:0; }
+
+/* ---------- painéis */
+.paineis{
+  position:absolute;
+  inset:0;
+  z-index:20;
+  pointer-events:none;
+}
+.painel{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:max(104px, calc(env(safe-area-inset-top, 0px) + 88px)) clamp(20px, 5vw, 60px) max(96px, calc(env(safe-area-inset-bottom, 0px) + 80px));
+  opacity:0;
+  will-change:opacity,transform;
+  text-shadow:0 2px 28px rgba(0,0,0,.65);
+  --e:0;
+  --s:0;
+}
+.painel-miolo{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  max-width:100%;
+  padding:clamp(26px, 3.6vw, 48px) clamp(18px, 3.6vw, 56px);
+}
+
+/* moldura de mira: as quatro cantoneiras fecham sobre o texto na entrada
+   e se abrem de novo na saída */
+.moldura{
+  position:absolute;
+  width:clamp(18px, 2.2vw, 28px);
+  height:clamp(18px, 2.2vw, 28px);
+  border:0 solid rgba(236,235,231,.75);
+  opacity:calc(var(--e) * (1 - var(--s)));
+  --d:calc((1 - var(--e)) * 44px + var(--s) * 70px);
+}
+.m1{ top:0; left:0; border-top-width:1.5px; border-left-width:1.5px; transform:translate(calc(var(--d) * -1), calc(var(--d) * -1)); }
+.m2{ top:0; right:0; border-top-width:1.5px; border-right-width:1.5px; transform:translate(var(--d), calc(var(--d) * -1)); }
+.m3{ bottom:0; right:0; border-bottom-width:1.5px; border-right-width:1.5px; transform:translate(var(--d), var(--d)); }
+.m4{ bottom:0; left:0; border-bottom-width:1.5px; border-left-width:1.5px; transform:translate(calc(var(--d) * -1), var(--d)); }
+
+.painel .olho{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:6px 12px;
+  margin-bottom:clamp(16px, 2vw, 22px);
+  max-width:min(46ch, 100%);
+  color:var(--fg);
+  opacity:.85;
+}
+.painel .olho b{
+  font-weight:500;
+  color:var(--laser, #ff3b2f);
+  padding-right:12px;
+  border-right:1px solid var(--rule);
+}
+.painel h1{
+  font-family:var(--fonte-titulo);
+  font-weight:800;
+  font-size:clamp(40px, 8.2vw, 124px);
+  line-height:.92;
+  letter-spacing:.005em;
+  text-transform:uppercase;
+  max-width:15ch;
+  text-wrap:balance;
+  /* entra de cima para baixo como um scan; sai desfocando e crescendo */
+  clip-path:inset(-20% -12% calc(-20% + (1 - var(--e)) * 140%) -12%);
+  filter:blur(calc(var(--s) * 12px));
+  transform:scale(calc(1 + var(--s) * .08));
+}
+.painel .sub{
+  margin-top:clamp(18px, 2.2vw, 28px);
+  font-size:clamp(15px, 1.28vw, 19px);
+  line-height:1.5;
+  color:var(--fg);
+  opacity:.82;
+  max-width:min(46ch, 100%);
+  text-wrap:pretty;
+}
+.painel .cta{
+  margin-top:clamp(28px, 3.4vw, 44px);
+  pointer-events:auto;
+  width:100%;
+  display:flex;
+  justify-content:center;
+}
+.painel .cta .pilula{
+  min-height:48px;
+  padding:0 27px;
+  font-size:13.5px;
+  max-width:min(100%, 320px);
+  text-shadow:none;
+}
+
+/* ---------- capítulos: trilho à direita, clicável */
+.capitulos{
+  position:absolute;
+  right:max(10px, env(safe-area-inset-right, 0px));
+  top:50%;
+  z-index:25;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  transform:translateY(-50%);
+}
+.capitulos button{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+  min-width:44px;
+  min-height:44px;
+  padding:0 6px;
+  border:0;
+  background:none;
+  font-family:var(--fonte-mono);
+  font-size:11px;
+  letter-spacing:.12em;
+  color:var(--fg-faint);
+  cursor:pointer;
+}
+.capitulos button::after{
+  content:"";
+  width:14px;
+  height:1.5px;
+  background:currentColor;
+  transition:width .35s var(--ease), background-color .35s var(--ease);
+}
+.capitulos button span{ opacity:0; transform:translateX(6px); transition:opacity .3s var(--ease), transform .3s var(--ease); }
+.capitulos button:hover span,
+.capitulos button.ativo span{ opacity:1; transform:none; }
+.capitulos button.ativo{ color:var(--fg); }
+.capitulos button.ativo::after{ width:30px; background:var(--laser, #ff3b2f); }
+.capitulos button:focus-visible{ outline-offset:-2px; }
+
+/* ---------- rodapé da cena */
+.cena-rodape{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  z-index:25;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:14px calc(var(--margem) + 72px) max(18px, calc(env(safe-area-inset-bottom, 0px) + 14px)) var(--margem);
+  font-family:var(--fonte-mono);
+  font-size:11px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--fg-faint);
+  pointer-events:none;
+}
+.cena-rodape b{ font-weight:500; color:var(--fg); font-variant-numeric:tabular-nums; }
+
+/* ---------- faixa do lema entre a cena e o arsenal */
+.faixa{
+  position:relative;
+  z-index:3;
+  overflow:hidden;
+  padding:18px 0;
+  background:var(--bg);
+  border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+}
+.faixa::before,
+.faixa::after{
+  content:"";
+  position:absolute;
+  left:0; right:0;
+  height:5px;
+  background:repeating-linear-gradient(-45deg, rgba(236,235,231,.22) 0 6px, transparent 6px 14px);
+}
+.faixa::before{ top:0; }
+.faixa::after{ bottom:0; }
+.faixa-trilho{
+  display:flex;
+  align-items:center;
+  gap:clamp(18px, 2.4vw, 36px);
+  width:max-content;
+  will-change:transform;
+  font-family:var(--fonte-titulo);
+  font-weight:800;
+  font-size:clamp(34px, 5.4vw, 76px);
+  line-height:1;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.faixa-trilho span:nth-of-type(even){
+  color:transparent;
+  -webkit-text-stroke:1px rgba(236,235,231,.6);
+}
+.faixa-trilho i{
+  font-style:normal;
+  font-family:var(--fonte-mono);
+  font-size:.4em;
+  color:var(--laser, #ff3b2f);
+}
+
+@media (max-width:900px){
+  .veu{
+    background:
+      linear-gradient(to bottom, rgba(10,10,10,.72) 0%, rgba(10,10,10,.18) 24%, rgba(10,10,10,.18) 76%, rgba(10,10,10,.76) 100%),
+      radial-gradient(100% 80% at 50% 48%, rgba(10,10,10,0) 0%, rgba(10,10,10,.40) 100%),
+      rgba(10,10,10,.24);
+  }
+}
+
+@media (max-width:720px){
+  .painel h1{ max-width:12ch; font-size:clamp(36px, 11vw, 60px); }
+  .painel .sub{ font-size:15px; max-width:34ch; }
+  .painel{ padding:max(92px, calc(env(safe-area-inset-top, 0px) + 76px)) 30px max(88px, calc(env(safe-area-inset-bottom, 0px) + 72px)); }
+  .painel-miolo{ padding:24px 14px; }
+  .cena-rodape-meio,
+  .cena-rodape > span:first-child{ display:none; }
+  .cena-rodape{ justify-content:flex-start; }
+  .cena-rodape{ font-size:10px; letter-spacing:.1em; }
+  .capitulos{ right:0; }
+  .capitulos button{ min-width:36px; padding:0 4px; }
+  .capitulos button span{ display:none; }
+  .hud-regua{ left:4px; width:10px; }
+  .hud-alvo b{ display:none; }
+}
+
+@media (max-width:420px){
+  .painel h1{ max-width:11ch; font-size:clamp(34px, 12vw, 46px); }
+  .painel .olho{ font-size:11px; letter-spacing:.1em; max-width:28ch; }
+  .painel .cta .pilula{ width:100%; max-width:280px; min-height:44px; padding:0 20px; }
+}
+
+@media (max-height:520px) and (orientation:landscape){
+  .painel{ padding:max(72px, calc(env(safe-area-inset-top, 0px) + 56px)) 64px max(64px, calc(env(safe-area-inset-bottom, 0px) + 48px)); }
+  .painel-miolo{ padding:14px 20px; }
+  .painel h1{ font-size:clamp(30px, 9vh, 48px); }
+  .painel .sub{ margin-top:12px; font-size:14px; }
+  .painel .cta{ margin-top:16px; }
+  .cena-rodape{ display:none; }
+}
+
+/* Movimento reduzido: sem vídeo controlado pela rolagem; painéis empilhados sobre o pôster */
+.reduzido .trilha{ height:auto; min-height:0; }
+.reduzido .cena{ position:relative; height:auto; }
+.reduzido .cena canvas{ height:100vh; height:100svh; }
+.reduzido .cena-hud,
+.reduzido .capitulos,
+.reduzido .cena-rodape{ display:none; }
+.reduzido .paineis{ position:relative; }
+.reduzido .painel{ position:relative; opacity:1; transform:none; min-height:100vh; --e:1; --s:0; }
+.reduzido .medidor,
+.reduzido body::after{ display:none; }

@@ -1,0 +1,235 @@
+/* Arsenal: vitrine de estampas. */
+
+.arsenal{
+  position:relative;
+  z-index:2;
+  background:var(--bg);
+  padding:clamp(96px, 12vw, 160px) max(var(--margem), env(safe-area-inset-right, 0px)) clamp(80px, 10vw, 140px) max(var(--margem), env(safe-area-inset-left, 0px));
+}
+
+/* Topo de seção (usado também no Quem Somos) */
+.secao-topo{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  text-align:center;
+  margin-bottom:clamp(40px, 6vw, 72px);
+}
+.secao-titulo{
+  font-family:var(--fonte-titulo);
+  font-weight:800;
+  font-size:clamp(56px, 11vw, 148px);
+  line-height:.88;
+  letter-spacing:.01em;
+  text-transform:uppercase;
+}
+
+.arsenal-grade{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:clamp(20px, 2.6vw, 32px);
+  max-width:1320px;
+  margin:0 auto;
+}
+@media (min-width:640px){ .arsenal-grade{ grid-template-columns:repeat(2, 1fr); } }
+@media (min-width:1024px){ .arsenal-grade{ grid-template-columns:repeat(3, 1fr); } }
+
+/* Card */
+.card{
+  display:flex;
+  flex-direction:column;
+  background:var(--bg-2);
+  border:1px solid var(--rule);
+}
+.card{ transition:border-color .4s var(--ease); }
+
+/* Entrada como aquisição de alvo: o card sobe, as cantoneiras fecham, a varredura
+   desce e a camisa aparece atrás dela. Animações (não transitions) para o atraso
+   da sequência não contaminar o hover depois. */
+.com-entrada .card:not(.visivel){ opacity:0; }
+.com-entrada .card.visivel:not(.entrou){ animation:card-entra .7s var(--ease) var(--atraso, 0ms) backwards; }
+.com-entrada .card.visivel:not(.entrou) .canto{ animation:canto-fecha .55s cubic-bezier(.16,1,.3,1) calc(var(--atraso, 0ms) + .15s) backwards; }
+.com-entrada .card.visivel:not(.entrou) .face{ animation:face-revela .9s cubic-bezier(.16,1,.3,1) calc(var(--atraso, 0ms) + .3s) backwards; }
+.com-entrada .card.visivel:not(.entrou) .card-scan{ animation:scan-desce .9s cubic-bezier(.16,1,.3,1) calc(var(--atraso, 0ms) + .3s) backwards; }
+.com-entrada .card.visivel:not(.entrou) .card-info > *{ animation:card-entra .6s var(--ease) calc(var(--atraso, 0ms) + .45s) backwards; }
+.com-entrada .card.visivel:not(.entrou) .card-id{ animation:card-id-entra .5s steps(6, end) calc(var(--atraso, 0ms) + .5s) backwards; }
+
+@keyframes card-entra{ from{ opacity:0; transform:translateY(26px); } }
+@keyframes canto-fecha{ from{ opacity:0; transform:translate(var(--cx), var(--cy)) scale(1.4); } }
+@keyframes face-revela{ from{ clip-path:inset(0 0 100% 0); } to{ clip-path:inset(0 0 0 0); } }
+@keyframes scan-desce{
+  0%{ opacity:1; top:0; }
+  85%{ opacity:1; }
+  100%{ opacity:0; top:100%; }
+}
+@keyframes card-id-entra{ from{ clip-path:inset(0 100% 0 0); } to{ clip-path:inset(0 0 0 0); } }
+
+/* etiqueta Nº + cor e linha de varredura */
+.card-id{
+  position:absolute;
+  top:14px;
+  left:36px;
+  z-index:2;
+  font-family:var(--fonte-mono);
+  font-size:10.5px;
+  letter-spacing:.14em;
+  color:var(--fg-faint);
+  transition:color .3s var(--ease);
+  pointer-events:none;
+}
+.card-scan{
+  position:absolute;
+  left:0; right:0; top:0;
+  z-index:2;
+  height:2px;
+  opacity:0;
+  background:var(--laser, #ff3b2f);
+  box-shadow:0 0 12px 2px rgba(255,59,47,.45), 0 -40px 40px -20px rgba(255,59,47,.12);
+  pointer-events:none;
+}
+
+.card-palco{
+  position:relative;
+  aspect-ratio:1 / 1.08;
+  padding:clamp(18px, 3vw, 30px);
+  perspective:1400px;
+}
+
+/* Cantoneiras de mira nos quatro cantos */
+.canto{
+  position:absolute;
+  width:18px;
+  height:18px;
+  border:0 solid var(--fg-faint);
+  pointer-events:none;
+}
+.canto{ transition:transform .35s cubic-bezier(.16,1,.3,1), border-color .25s linear; }
+.canto-1{ top:10px; left:10px; border-top-width:1px; border-left-width:1px; --cx:-18px; --cy:-18px; }
+.canto-2{ top:10px; right:10px; border-top-width:1px; border-right-width:1px; --cx:18px; --cy:-18px; }
+.canto-3{ bottom:10px; right:10px; border-bottom-width:1px; border-right-width:1px; --cx:18px; --cy:18px; }
+.canto-4{ bottom:10px; left:10px; border-bottom-width:1px; border-left-width:1px; --cx:-18px; --cy:18px; }
+
+.carta{
+  position:relative;
+  width:100%;
+  height:100%;
+  transform-style:preserve-3d;
+  transition:transform .8s var(--ease);
+}
+.carta.virada{ transform:rotateY(180deg); }
+.face{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  transition:opacity .15s linear;
+}
+.face-frente{ transform:rotateY(180deg); }
+.face.trocando{ opacity:0; }
+
+/* No desktop, passar o mouse mostra o outro lado e a mira vira cursor */
+@media (hover:hover) and (pointer:fine){
+  .card-palco{
+    cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><g fill='none' stroke='%23ecebe7' stroke-width='1.5'><circle cx='16' cy='16' r='9'/><path d='M16 2v8M16 22v8M2 16h8M22 16h8'/></g></svg>") 16 16, crosshair;
+  }
+  .card-palco:hover .carta{ transform:rotateY(180deg); }
+  .card-palco:hover .carta.virada{ transform:rotateY(0deg); }
+  /* travou no alvo: cantoneiras fecham em vermelho e a varredura passa de novo */
+  .card:hover{ border-color:rgba(236,235,231,.32); }
+  .card-palco:hover .canto{ border-color:var(--laser, #ff3b2f); }
+  .card-palco:hover .canto-1{ transform:translate(6px, 6px); }
+  .card-palco:hover .canto-2{ transform:translate(-6px, 6px); }
+  .card-palco:hover .canto-3{ transform:translate(-6px, -6px); }
+  .card-palco:hover .canto-4{ transform:translate(6px, -6px); }
+  .card-palco:hover .card-id{ color:var(--laser, #ff3b2f); }
+  .card-palco:hover .card-scan{ animation:scan-desce .8s cubic-bezier(.16,1,.3,1); }
+}
+
+.card-info{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  padding:20px clamp(18px, 2.4vw, 26px) 24px;
+  border-top:1px solid var(--rule);
+}
+.card-nome{
+  font-family:var(--fonte-titulo);
+  font-weight:800;
+  font-size:clamp(28px, 3vw, 36px);
+  line-height:.95;
+  text-transform:uppercase;
+}
+.card-desc{
+  font-family:var(--fonte-mono);
+  font-size:12px;
+  letter-spacing:.04em;
+  color:var(--fg-soft);
+}
+
+.seletor{ display:flex; flex-wrap:wrap; gap:6px; }
+.seletor[hidden]{ display:none; }
+
+/* Bolinha de cor: área de toque de 36 px, círculo visível de 22 px */
+.bolinha{
+  position:relative;
+  width:36px;
+  height:36px;
+  padding:0;
+  border:0;
+  background:none;
+  cursor:pointer;
+}
+.bolinha::before{
+  content:"";
+  position:absolute;
+  inset:7px;
+  border-radius:50%;
+  background:var(--cor);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);
+}
+.bolinha[aria-pressed="true"]::after{
+  content:"";
+  position:absolute;
+  inset:2px;
+  border-radius:50%;
+  border:1px solid var(--fg);
+}
+
+.chip{
+  min-height:36px;
+  padding:0 14px;
+  border:1px solid var(--rule);
+  border-radius:999px;
+  background:none;
+  font-family:var(--fonte-mono);
+  font-size:12px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:border-color .3s var(--ease), background .3s var(--ease);
+}
+.chip:hover{ border-color:var(--fg-faint); }
+.chip[aria-pressed="true"]{ background:var(--fg); color:var(--bg); border-color:var(--fg); }
+
+.card-acoes{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:4px;
+}
+.card-acoes .pilula{ flex:1 1 auto; min-height:44px; }
+
+/* Movimento reduzido: sem giro 3D, troca direta de lado */
+@media (prefers-reduced-motion:reduce){
+  .carta, .carta.virada, .card-palco:hover .carta{ transform:none !important; transition:none; }
+  .face{ backface-visibility:visible; -webkit-backface-visibility:visible; transform:none; transition:none; }
+  .face-frente{ visibility:hidden; }
+  .carta.virada .face-frente{ visibility:visible; }
+  .carta.virada .face-costas{ visibility:hidden; }
+}

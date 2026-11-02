@@ -1,0 +1,145 @@
+/* Quem Somos: texto oficial da loja em blocos no estilo Blackout. */
+
+.sobre{
+  position:relative;
+  z-index:2;
+  background:var(--bg);
+  padding:clamp(88px, 11vw, 150px) max(var(--margem), env(safe-area-inset-right, 0px)) clamp(72px, 9vw, 120px) max(var(--margem), env(safe-area-inset-left, 0px));
+  border-top:1px solid var(--rule);
+}
+.sobre > *{ max-width:1180px; margin-left:auto; margin-right:auto; }
+
+/* Abertura: texto + escudo grande */
+.sobre-abertura{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:clamp(32px, 5vw, 64px);
+  align-items:center;
+}
+@media (min-width:900px){ .sobre-abertura{ grid-template-columns:1.25fr .75fr; } }
+.sobre-texto{ display:flex; flex-direction:column; gap:20px; }
+.sobre-titulo{
+  font-family:var(--fonte-titulo);
+  font-weight:800;
+  font-size:clamp(44px, 7.4vw, 104px);
+  line-height:.9;
+  text-transform:uppercase;
+  text-wrap:balance;
+}
+.sobre-lead{ font-size:clamp(17px, 1.5vw, 21px); line-height:1.5; max-width:52ch; }
+.sobre-corpo{ color:var(--fg-soft); max-width:56ch; text-wrap:pretty; }
+
+.sobre-escudo{ justify-self:center; width:min(78vw, 340px); }
+.sobre-escudo img{ width:100%; height:auto; }
+
+/* Missão / Visão */
+.sobre-blocos{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:clamp(16px, 2vw, 24px);
+  margin-top:clamp(64px, 8vw, 110px);
+}
+@media (min-width:760px){ .sobre-blocos{ grid-template-columns:1fr 1fr; } }
+.bloco{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  padding:clamp(28px, 3.4vw, 44px);
+  background:var(--bg-2);
+}
+.bloco-titulo{
+  font-family:var(--fonte-titulo);
+  font-weight:800;
+  font-size:clamp(30px, 3.4vw, 44px);
+  line-height:.95;
+  text-transform:uppercase;
+}
+.bloco p:last-child{ color:var(--fg-soft); }
+
+/* Valores: 4 itens, 2x2 no celular */
+.sobre-valores{ margin-top:clamp(64px, 8vw, 110px); }
+.valores{
+  list-style:none;
+  margin:22px auto 0;
+  padding:0;
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  border-top:1px solid var(--rule);
+  border-left:1px solid var(--rule);
+}
+@media (min-width:900px){ .valores{ grid-template-columns:repeat(4, 1fr); } }
+.valores li{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:clamp(18px, 2.4vw, 30px);
+  border-right:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+}
+.valor-nome{
+  font-family:var(--fonte-titulo);
+  font-weight:800;
+  font-size:clamp(20px, 2.3vw, 30px);
+  line-height:1;
+  text-transform:uppercase;
+  overflow-wrap:anywhere;
+}
+.valores p{ font-size:14px; color:var(--fg-soft); }
+
+/* Lista com marcadores de mira */
+.sobre-lista{ display:flex; flex-direction:column; gap:14px; margin-top:clamp(64px, 8vw, 110px); }
+.lista-mira{ list-style:none; margin:8px 0 0; padding:0; display:grid; gap:14px; }
+@media (min-width:760px){ .lista-mira{ grid-template-columns:1fr 1fr; } }
+.lista-mira li{ position:relative; padding-left:34px; line-height:1.45; }
+.lista-mira li::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:1px;
+  width:20px;
+  height:20px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><g fill='none' stroke='%23ecebe7' stroke-width='1.4'><circle cx='10' cy='10' r='5.5'/><path d='M10 1v5M10 14v5M1 10h5M14 10h5'/></g></svg>") center/contain no-repeat;
+}
+
+/* Fecho em faixa de largura total */
+.sobre-fecho{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:18px;
+  margin-top:clamp(80px, 10vw, 140px);
+  padding:clamp(40px, 6vw, 72px) clamp(16px, 4vw, 48px);
+  border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+  text-align:center;
+}
+.sobre-fecho-titulo{
+  font-family:var(--fonte-titulo);
+  font-weight:800;
+  font-size:clamp(32px, 5.4vw, 72px);
+  line-height:.95;
+  text-transform:uppercase;
+  text-wrap:balance;
+  max-width:20ch;
+}
+.sobre-fecho-sub{ color:var(--fg-soft); max-width:46ch; }
+.sobre-fecho .pilula{ min-height:48px; padding:0 27px; margin-top:6px; }
+
+/* Revelação ao entrar na tela (classe .com-revelar vem do JS) */
+.com-revelar .revelar{
+  opacity:0;
+  transform:translateY(20px);
+  transition:opacity .8s var(--ease), transform .8s var(--ease);
+}
+.com-revelar .revelar.visivel{ opacity:1; transform:none; }
+/* o escudo "se desenha" de baixo para cima (R3: <img> não permite animar o traço) */
+.com-revelar .sobre-escudo.revelar{
+  transform:none;
+  clip-path:inset(100% 0 0 0);
+  transition:opacity .4s linear, clip-path 1.4s var(--ease);
+}
+.com-revelar .sobre-escudo.revelar.visivel{ clip-path:inset(0 0 0 0); }
+.valores li.revelar:nth-child(2){ transition-delay:.08s; }
+.valores li.revelar:nth-child(3){ transition-delay:.16s; }
+.valores li.revelar:nth-child(4){ transition-delay:.24s; }
