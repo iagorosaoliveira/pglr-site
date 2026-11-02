@@ -64,6 +64,7 @@
   max-width:420px;
   aspect-ratio:1 / 1;
   touch-action:pan-y;        /* arrasto horizontal é nosso; rolagem vertical é do navegador */
+  perspective:1400px;        /* profundidade do giro da camisa */
   -webkit-user-select:none;
   user-select:none;
   cursor:grab;
@@ -102,7 +103,7 @@
 }
 .vizinha-anterior{ left:-28%; }
 .vizinha-proxima{ right:-28%; }
-.camisa{ position:absolute; inset:13%; z-index:1; will-change:transform; }
+.camisa{ position:absolute; inset:7%; z-index:1; will-change:transform; }
 .camisa img{
   display:block;
   width:100%;
@@ -111,6 +112,7 @@
   pointer-events:none;
   -webkit-user-drag:none;
 }
+.camisa .foto-reserva{ position:absolute; inset:0; visibility:hidden; }
 .mira-laser{ position:absolute; inset:0; z-index:2; opacity:0; pointer-events:none; }
 .mira-laser::before{
   content:"";
@@ -282,18 +284,36 @@
   border:0;
 }
 
-/* ---------- computador: duas colunas */
+/* ---------- computador: duas colunas, a vitrine ocupa a tela */
 @media (min-width:900px){
+  .arsenal{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    min-height:100vh;
+    min-height:100svh;
+  }
   .vitrine{
-    grid-template-columns:minmax(0, 1.15fr) minmax(0, .85fr);
+    width:100%;
+    max-width:1360px;
+    grid-template-columns:minmax(0, 1.3fr) minmax(0, .7fr);
     align-items:center;
-    gap:clamp(32px, 5vw, 72px);
+    gap:clamp(32px, 4vw, 64px);
   }
   .mira,
-  .trilho{ max-width:560px; }
-  .vitrine-info{ align-items:flex-start; text-align:left; }
+  .trilho{ max-width:min(760px, 66vh); }   /* mira + costas/frente + trilho cabem numa tela */
+  .mira-seta{ width:52px; height:52px; margin-top:-26px; font-size:22px; }
+  .lados button{ min-height:40px; padding:0 20px; font-size:12px; }
+  .miniatura{ height:74px; }
+  .miniatura img{ height:66px; }
+  .vitrine-info{ align-items:flex-start; gap:14px; text-align:left; }
+  .vitrine-num{ font-size:13px; }
+  .vitrine-nome{ font-size:clamp(56px, 6vw, 104px); }
+  .vitrine-desc{ font-size:14px; max-width:44ch; }
   .seletor{ justify-content:flex-start; }
-  .vitrine-pedir{ width:auto; min-width:280px; }
+  .bolinha{ width:44px; height:44px; }
+  .bolinha::before{ inset:9px; }
+  .vitrine-pedir{ width:auto; min-width:320px; min-height:58px; font-size:14px; }
 }
 
 /* ---------- entrada da seção (uma vez; classes postas pelo vitrine.js) */

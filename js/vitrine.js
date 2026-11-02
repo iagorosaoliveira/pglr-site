@@ -8,8 +8,15 @@
 })(this, function () {
   "use strict";
 
-  var CURVA = "cubic-bezier(0.23, 1, 0.32, 1)";  // a mesma de --ease-out
-  var DESLOCA = 18;           // % que a camisa anda ao sair e ao entrar
+  var CURVA = "cubic-bezier(0.23, 1, 0.32, 1)";       // a mesma de --ease-out
+  // O giro é um ease-in-out partido no meio: a ida acelera até a camisa ficar de lado,
+  // a volta freia até ela ficar de frente (easeInCubic / easeOutQuart, easings.net).
+  // A ida é mais curta, para o giro responder logo ao toque.
+  var CURVA_IDA = "cubic-bezier(0.32, 0, 0.67, 0)";
+  var CURVA_VOLTA = "cubic-bezier(0.25, 1, 0.5, 1)";
+  var GIRO_MS = 440;          // giro inteiro (de frente → de lado → de frente com a nova estampa)
+  var GIRO_ARRASTO = 0.35;    // graus de giro por px arrastado
+  var GIRO_MAX = 75;          // limite do giro durante o arrasto
   var GATILHO_PX = 50;        // arrasto mínimo para trocar
   var ARRASTO_CURTO_PX = 20;  // arrasto curto que ainda troca, se for rápido
   var VELOCIDADE = 0.5;       // px/ms
@@ -99,43 +106,79 @@
       if (el.getAnimations) el.getAnimations().forEach(function (a) { a.cancel(); });
     }
 
-    // Troca de foto: a atual sai para um lado e a nova entra do outro (dir = ±1);
-    // dir = 0 é só um esmaecer (troca de cor ou de arte). deX: onde o arrasto soltou.
-    function trocarFoto(src, alt, dir, deX) {
+    // Cor ou arte: a foto esmaece e volta com a nova (160 ms no total).
+    function trocarFoto(src, alt) {
       var minha = ++geracao;
-      var anda = reduzido ? 0 : dir * DESLOCA;
-      var escala = anda ? 0.96 : 1;
-      var inicio = deX ? "translateX(" + deX + "px)" : "none";
       parar(camisa);
       camisa.style.transform = "";
-      var saida = camisa.animate(
-        [{ transform: inicio, opacity: 1 },
-         { transform: "translateX(" + (-anda) + "%) scale(" + escala + ")", opacity: 0 }],
-        { duration: reduzido ? 75 : (dir ? 110 : 80), easing: CURVA, fill: "forwards" });
+      var saida = camisa.animate([{ opacity: 1 }, { opacity: 0 }],
+        { duration: reduzido ? 75 : 80, easing: CURVA, fill: "forwards" });
       Promise.all([saida.finished.catch(function () {}), precarregar(src)]).then(function () {
         if (minha !== geracao) return;
         foto.src = src;
         foto.alt = alt;
         parar(camisa);
-        camisa.animate(
-          [{ transform: "translateX(" + anda + "%) scale(" + escala + ")", opacity: 0 },
-           { transform: "none", opacity: 1 }],
-          { duration: reduzido ? 75 : (dir ? 130 : 80), easing: CURVA });
+        camisa.animate([{ opacity: 0 }, { opacity: 1 }], { duration: reduzido ? 75 : 80, easing: CURVA });
       });
     }
 
-    // Costas/frente: a nova foto é revelada de cima para baixo.
-    function revelarLado(src, alt) {
+    // Uma segunda imagem, já decodificada, fica por baixo do giro: no meio dele ela aparece
+    // na hora (trocar o src da foto principal leva um ou dois quadros para pintar, e a
+    // estampa antiga apareceria espelhada do outro lado).
+    var reserva = doc.createElement("img");
+    reserva.className = "foto-reserva";
+    reserva.alt = "";
+    reserva.setAttribute("aria-hidden", "true");
+    camisa.appendChild(reserva);
+
+    function prepararReserva(src) {
+      reserva.style.visibility = "hidden";
+      reserva.src = src;
+      return (reserva.decode ? reserva.decode() : precarregar(src)).catch(function () {});
+    }
+
+    function mostrarNova(src, alt) {
+      reserva.style.visibility = "visible";
+      foto.src = src;
+      foto.alt = alt;
+      var esconder = function () { if (foto.getAttribute("src") === src) reserva.style.visibility = "hidden"; };
+      (foto.decode ? foto.decode() : Promise.resolve()).then(esconder, esconder);
+    }
+
+    // Estampa ou lado: a camisa gira em Y como numa vitrine giratória. Vai de frente até
+    // ficar de lado (90°), troca a foto exatamente aí e volta de frente já com a nova.
+    // dir = +1 gira para a esquerda (próxima), -1 para a direita (anterior).
+    // deAng: de onde começar (o arrasto já deixou a camisa um pouco girada).
+    function girar(src, alt, dir, deAng) {
       var minha = ++geracao;
-      precarregar(src).then(function () {
+      var a0 = deAng || 0;
+      parar(camisa);
+      camisa.style.transform = a0 ? "rotateY(" + a0 + "deg)" : "";
+      prepararReserva(src).then(function () {
         if (minha !== geracao) return;
-        foto.src = src;
-        foto.alt = alt;
-        parar(camisa);
-        camisa.animate(reduzido
-          ? [{ opacity: 0 }, { opacity: 1 }]
-          : [{ clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)" }],
-          { duration: reduzido ? 150 : 260, easing: CURVA });
+        camisa.style.transform = "";
+        if (reduzido) {
+          mostrarNova(src, alt);
+          camisa.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 150, easing: CURVA });
+          return;
+        }
+        var sai = -90 * dir, entra = 90 * dir;
+        function pose(ang, escala, luz) {
+          return { transform: "rotateY(" + ang + "deg) scale(" + escala + ")", filter: "brightness(" + luz + ")" };
+        }
+        // ida: de onde estiver até ficar de lado (mais curta se o arrasto já girou um pouco)
+        var ida = camisa.animate([pose(a0, 1, 1), pose(sai, 0.92, 0.5)], {
+          duration: GIRO_MS * 0.42 * (1 - Math.min(Math.abs(a0), 80) / 90),
+          easing: CURVA_IDA,
+          fill: "forwards"
+        });
+        // de lado ela é só um risco: é aí que a foto troca, e a volta começa do outro lado
+        ida.finished.then(function () {
+          if (minha !== geracao) return;
+          mostrarNova(src, alt);
+          parar(camisa);
+          camisa.animate([pose(entra, 0.92, 0.5), pose(0, 1, 1)], { duration: GIRO_MS * 0.58, easing: CURVA_VOLTA });
+        }, function () {});
       });
     }
 
@@ -210,7 +253,7 @@
     });
 
     // tipo: "estampa" | "cor" | "arte" | "lado" | null (primeira pintura, sem animação)
-    function render(tipo, dir, deX) {
+    function render(tipo, dir, deAng) {
       var e = estampas[estado.indice];
       var cor = e.cores[estado.cor];
       var ant = estampas[circular(estado.indice - 1, n)], prox = estampas[circular(estado.indice + 1, n)];
@@ -236,12 +279,12 @@
         angulo += 30 * dir;
         anel.style.transform = "rotate(" + angulo + "deg)";
         varrer();
-        trocarFoto(src, alt, dir, deX);
+        girar(src, alt, dir, deAng);
       } else if (tipo === "lado") {
         varrer();
-        revelarLado(src, alt);
+        girar(src, alt, estado.lado === "frente" ? 1 : -1, 0);
       } else if (tipo) {
-        trocarFoto(src, alt, 0);
+        trocarFoto(src, alt);
       } else {
         foto.src = src;
         foto.alt = alt;
@@ -251,15 +294,15 @@
       precarregar(srcProx);
     }
 
-    function irPara(i, dir, deX) {
+    function irPara(i, dir, deAng) {
       i = circular(i, n);
       if (i === estado.indice) return;
       dir = dir || (i > estado.indice ? 1 : -1);   // antes de trocar o estado
       estado = trocarEstampa(estado, i, n);
-      render("estampa", dir, deX);
+      render("estampa", dir, deAng);
     }
-    function avancar(deX) { irPara(estado.indice + 1, 1, deX); }
-    function voltar(deX) { irPara(estado.indice - 1, -1, deX); }
+    function avancar(deAng) { irPara(estado.indice + 1, 1, deAng); }
+    function voltar(deAng) { irPara(estado.indice - 1, -1, deAng); }
 
     $("vitrine-avancar").addEventListener("click", function () { avancar(); });
     $("vitrine-voltar").addEventListener("click", function () { voltar(); });
@@ -278,11 +321,12 @@
       else if (ev.key === "ArrowLeft") { ev.preventDefault(); voltar(); }
     });
 
-    // Arrasto na mira (o navegador continua cuidando da rolagem vertical: touch-action: pan-y)
+    // Arrasto na mira gira a camisa junto com o dedo (o navegador continua cuidando da
+    // rolagem vertical: touch-action: pan-y). Soltando além do gatilho, o giro continua.
     var arrasto = null;
     mira.addEventListener("pointerdown", function (ev) {
       if (ev.button !== 0 || ev.target.closest("button")) return;
-      arrasto = { x0: ev.clientX, x: ev.clientX, t: ev.timeStamp, v: 0, id: ev.pointerId };
+      arrasto = { x0: ev.clientX, x: ev.clientX, t: ev.timeStamp, v: 0, ang: 0, id: ev.pointerId };
       try { mira.setPointerCapture(ev.pointerId); } catch (e) {}
       parar(camisa);
     });
@@ -292,17 +336,18 @@
       if (dt > 0) arrasto.v = (ev.clientX - arrasto.x) / dt;
       arrasto.x = ev.clientX;
       arrasto.t = ev.timeStamp;
-      if (!reduzido) camisa.style.transform = "translateX(" + (arrasto.x - arrasto.x0) + "px)";
+      arrasto.ang = Math.max(-GIRO_MAX, Math.min(GIRO_MAX, (arrasto.x - arrasto.x0) * GIRO_ARRASTO));
+      if (!reduzido) camisa.style.transform = "rotateY(" + arrasto.ang.toFixed(1) + "deg)";
     });
     function soltar(ev) {
       if (!arrasto || ev.pointerId !== arrasto.id) return;
-      var dx = arrasto.x - arrasto.x0, dir = direcaoArrasto(dx, arrasto.v);
+      var dx = arrasto.x - arrasto.x0, dir = direcaoArrasto(dx, arrasto.v), ang = reduzido ? 0 : arrasto.ang;
       arrasto = null;
-      if (dir > 0) { avancar(reduzido ? 0 : dx); return; }
-      if (dir < 0) { voltar(reduzido ? 0 : dx); return; }
+      if (dir > 0) { avancar(ang); return; }
+      if (dir < 0) { voltar(ang); return; }
       camisa.style.transform = "";
-      if (dx && !reduzido) {
-        camisa.animate([{ transform: "translateX(" + dx + "px)" }, { transform: "none" }],
+      if (ang) {
+        camisa.animate([{ transform: "rotateY(" + ang + "deg)" }, { transform: "none" }],
           { duration: 240, easing: CURVA });
       }
     }
